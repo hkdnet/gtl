@@ -16,6 +16,7 @@ const (
 	IDENTIFIER
 	LPAREN
 	RPAREN
+	ARROW
 )
 
 type Token struct {
@@ -68,6 +69,11 @@ func (l *Lexer) NextToken() (*Token, error) {
 		mode = RPAREN
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
+	case c == "-":
+		if l.source[idx+1:idx+2] == ">" {
+			l.cur += 2
+			return &Token{ARROW, l.source[beg : beg+2]}, nil
+		}
 	}
 
 	l.cur = idx
