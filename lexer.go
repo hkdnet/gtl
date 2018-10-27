@@ -25,6 +25,8 @@ type Token struct {
 	text      string
 }
 
+var ErrUnknownToken = errors.New("Unknown token")
+
 func (t *Token) IsEqual(other *Token) bool {
 	if t == nil {
 		return other == nil
@@ -62,6 +64,8 @@ func (l *Lexer) NextToken() (*Token, error) {
 				break
 			}
 		}
+		l.cur = idx
+		return &Token{mode, l.source[beg:idx]}, nil
 	case c == "(":
 		mode = LPAREN
 		l.cur++
@@ -81,6 +85,5 @@ func (l *Lexer) NextToken() (*Token, error) {
 		}
 	}
 
-	l.cur = idx
-	return &Token{mode, l.source[beg:idx]}, nil
+	return nil, ErrUnknownToken
 }

@@ -33,4 +33,14 @@ func TestNextToken(t *testing.T) {
 			t.Errorf("case %d: want cursor to be %d but %d\n", i, v.curAfter, l.cur)
 		}
 	}
+	// unknown token
+	{
+		l := NewLexer("❗")
+		_, err := l.NextToken()
+		if err == nil {
+			t.Error("next token should return with unknown token")
+		} else if err != ErrUnknownToken {
+			t.Errorf("err should be ErrUnknownToken but got %v", err)
+		}
+	}
 }
