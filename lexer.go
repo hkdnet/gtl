@@ -17,6 +17,7 @@ const (
 	LPAREN
 	RPAREN
 	ARROW
+	DOT
 )
 
 type Token struct {
@@ -67,6 +68,10 @@ func (l *Lexer) NextToken() (*Token, error) {
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ")":
 		mode = RPAREN
+		l.cur++
+		return &Token{mode, l.source[beg : beg+1]}, nil
+	case c == ".":
+		mode = DOT
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == "-":

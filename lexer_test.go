@@ -18,6 +18,7 @@ func TestNextToken(t *testing.T) {
 		{")", &Token{RPAREN, ")"}, 1},
 		{" )", &Token{RPAREN, ")"}, 2},
 		{"->", &Token{ARROW, "->"}, 2},
+		{".", &Token{DOT, "."}, 1},
 	}
 	for i, v := range testcases {
 		l := NewLexer(v.src)
