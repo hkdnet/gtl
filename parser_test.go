@@ -52,4 +52,26 @@ func TestParse(t *testing.T) {
 	if want, got := False, program.children[0].nodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
+	tokens = []Token{
+		{Word, "if"},
+		{Word, "true"},
+		{Word, "then"},
+		{Word, "true"},
+		{Word, "else"},
+		{Word, "false"},
+		{EOF, ""},
+	}
+	ast, err = Parse(tokens)
+
+	assertValidAST(ast)
+	program = ast.child
+	if want, got := 1, len(program.children); got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := IF, program.children[0].nodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := True, program.children[0].children[0].nodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
 }
