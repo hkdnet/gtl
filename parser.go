@@ -54,6 +54,13 @@ func Parse(tokens []Token) (*AST, error) {
 				tmp.children = []*Node{
 					&Node{nodeType: TRUE},
 				}
+				continue
+			}
+			if t.text == "false" {
+				tmp.children = []*Node{
+					&Node{nodeType: FALSE},
+				}
+				continue
 			}
 		}
 	}
