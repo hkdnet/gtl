@@ -21,6 +21,7 @@ func TestNextToken(t *testing.T) {
 		{"a", &Token{Word, "a"}, 1},
 		{"ab", &Token{Word, "ab"}, 2},
 		{"a b", &Token{Word, "a"}, 1},
+		{"a)", &Token{Word, "a"}, 1},
 		{"(", &Token{LParen, "("}, 1},
 		{"(a", &Token{LParen, "("}, 1},
 		{")", &Token{RParen, ")"}, 1},
