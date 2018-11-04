@@ -54,7 +54,7 @@ func (l *Lexer) NextToken() (*Token, error) {
 	var mode TokenType
 	c := l.source[idx : idx+1]
 	switch {
-	case c == " ": // TODO: other whitespaces...
+	case isWhitespace(c):
 		l.cur++
 		return l.NextToken()
 	case strings.Contains("abcdefghijklmnopqrstuvwxyz", c):
@@ -86,4 +86,8 @@ func (l *Lexer) NextToken() (*Token, error) {
 	}
 
 	return nil, ErrUnknownToken
+}
+
+func isWhitespace(s string) bool {
+	return s == "\t" || s == "\n" || s == "\r" || s == "\f" || s == " "
 }
