@@ -5,34 +5,47 @@ import (
 	"strings"
 )
 
+// Lexer is a lexer for typed_lang
 type Lexer struct {
 	source string
 	cur    int
 }
+
+// TokenType is an enum for token, which represents what a token is.
 type TokenType uint8
 
 const (
+	// EOF is an end of file
 	EOF = iota
+	// IDENTIFIER is an identifier, which may be a variable name or function name, etc.
 	IDENTIFIER
+	// LPAREN is "("
 	LPAREN
+	// RPAREN is ")"
 	RPAREN
+	// ARROW is "->"
 	ARROW
+	// DOT is "."
 	DOT
 )
 
+// Token is a token of typed_lang
 type Token struct {
 	tokenType TokenType
 	text      string
 }
 
-var ErrUnknownToken = errors.New("Unknown token")
+var (
+	// ErrUnknownToken is an error for lexer, which means the source is not a valid typed_lang
+	ErrUnknownToken = errors.New("Unknown token")
+)
 
+// NewLexer returns a new lexer from source string
 func NewLexer(source string) *Lexer {
 	return &Lexer{source, 0}
 }
 
-var NotFound error = errors.New("no new token")
-
+// NextToken returns a next token, and increments its cursor
 func (l *Lexer) NextToken() (*Token, error) {
 	beg := l.cur
 	if beg == len(l.source) {
