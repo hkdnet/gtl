@@ -79,6 +79,9 @@ func (l *Lexer) NextToken() (*Token, error) {
 			if isWhitespace(c) {
 				break
 			}
+			if c == "(" || c == ")" {
+				break
+			}
 		}
 		l.cur = idx
 		return &Token{mode, l.source[beg:idx]}, nil
