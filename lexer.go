@@ -75,7 +75,8 @@ func (l *Lexer) NextToken() (*Token, error) {
 	case strings.Contains("abcdefghijklmnopqrstuvwxyz", c):
 		mode = Word
 		for ; idx < len(l.source); idx++ {
-			if l.source[idx:idx+1] == " " {
+			c := l.source[idx : idx+1]
+			if isWhitespace(c) {
 				break
 			}
 		}
