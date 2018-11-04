@@ -12,21 +12,21 @@ type Node struct {
 }
 
 const (
-	PROGRAM NodeType = iota
-	TRUE
-	FALSE
+	Program NodeType = iota
+	True
+	False
 	IF
-	ZERO
-	SUCC
-	PRED
-	ISZERO
+	Zero
+	Succ
+	Pred
+	IsZero
 )
 
 func (n *Node) IsNumericalValue() bool {
-	if n.nodeType == ZERO {
+	if n.nodeType == Zero {
 		return true
 	}
-	if n.nodeType == SUCC {
+	if n.nodeType == Succ {
 		c := n.children[0]
 		return c.IsNumericalValue()
 	}
@@ -34,7 +34,7 @@ func (n *Node) IsNumericalValue() bool {
 }
 
 func (n *Node) IsValue() bool {
-	if n.nodeType == TRUE || n.nodeType == FALSE {
+	if n.nodeType == True || n.nodeType == False {
 		return true
 	}
 	return n.IsNumericalValue()
@@ -42,7 +42,7 @@ func (n *Node) IsValue() bool {
 
 func Parse(tokens []Token) (*AST, error) {
 	var tmp *Node
-	tmp = &Node{nodeType: PROGRAM}
+	tmp = &Node{nodeType: Program}
 	ret := &AST{child: tmp}
 
 	for i, l := 0, len(tokens); i < l; i++ {
@@ -52,13 +52,13 @@ func Parse(tokens []Token) (*AST, error) {
 		case Word:
 			if t.text == "true" {
 				tmp.children = []*Node{
-					&Node{nodeType: TRUE},
+					&Node{nodeType: True},
 				}
 				continue
 			}
 			if t.text == "false" {
 				tmp.children = []*Node{
-					&Node{nodeType: FALSE},
+					&Node{nodeType: False},
 				}
 				continue
 			}
