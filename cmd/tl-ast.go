@@ -37,20 +37,20 @@ func run(filename string) error {
 		tokens = append(tokens, token)
 	}
 	for _, v := range tokens {
-		fmt.Printf("%v\n", v)
+		fmt.Printf("%10s: %v\n", v.TokenType, v.Text)
 	}
 	ast, err := gtl.Parse(tokens)
 	if err != nil {
 		return err
 	}
-	show(ast.Child, "")
+	showNode(ast.Child, "")
 	return nil
 }
 
-func show(n *gtl.Node, indent string) {
+func showNode(n *gtl.Node, indent string) {
 	fmt.Printf("%s%s\n", indent, n.NodeType)
 	nextIndent := indent + "  "
 	for _, c := range n.Children {
-		show(c, nextIndent)
+		showNode(c, nextIndent)
 	}
 }
