@@ -1,7 +1,6 @@
 package gtl
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -176,5 +175,5 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 
 	}
 
-	return nil, i, errors.New("cannot parse")
+	return nil, i, fmt.Errorf("cannot parse at %d", i)
 }

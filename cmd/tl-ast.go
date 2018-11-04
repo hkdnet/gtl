@@ -36,8 +36,8 @@ func run(filename string) error {
 		}
 		tokens = append(tokens, token)
 	}
-	for _, v := range tokens {
-		fmt.Printf("%10s: %v\n", v.TokenType, v.Text)
+	for i, v := range tokens {
+		fmt.Printf("%3d%10s: %v\n", i, v.TokenType, v.Text)
 	}
 	ast, err := gtl.Parse(tokens)
 	if err != nil {
