@@ -70,7 +70,7 @@ func (n *Node) IsValue() bool {
 }
 
 // Parse returns an AST for tokens.
-func Parse(tokens []Token) (*AST, error) {
+func Parse(tokens []*Token) (*AST, error) {
 	var tmp *Node
 	tmp = &Node{nodeType: Program}
 	ret := &AST{child: tmp}
@@ -84,7 +84,7 @@ func Parse(tokens []Token) (*AST, error) {
 	return ret, nil
 }
 
-func parse(tokens []Token, i int) (*Node, int, error) {
+func parse(tokens []*Token, i int) (*Node, int, error) {
 	fmt.Printf("DEBUG: %d\n", i)
 	switch t := tokens[i]; t.tokenType {
 	case EOF:

@@ -3,7 +3,7 @@ package gtl
 import "testing"
 
 func TestParse(t *testing.T) {
-	var tokens []Token
+	var tokens []*Token
 	var ast *AST
 	var err error
 	var program *Node
@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 	}
 
 	// case: values
-	tokens = []Token{
+	tokens = []*Token{
 		{Word, "true"},
 		{EOF, ""},
 	}
@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
-	tokens = []Token{
+	tokens = []*Token{
 		{Word, "false"},
 		{EOF, ""},
 	}
@@ -54,7 +54,7 @@ func TestParse(t *testing.T) {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
-	tokens = []Token{
+	tokens = []*Token{
 		{Number, "0"},
 		{EOF, ""},
 	}
@@ -70,7 +70,7 @@ func TestParse(t *testing.T) {
 	}
 
 	// case if
-	tokens = []Token{
+	tokens = []*Token{
 		{Word, "if"},
 		{Word, "true"},
 		{Word, "then"},
@@ -94,7 +94,7 @@ func TestParse(t *testing.T) {
 	}
 
 	// case lambda
-	tokens = []Token{
+	tokens = []*Token{
 		{Word, "a"},
 		{Dot, "."},
 		{Arrow, "->"},
