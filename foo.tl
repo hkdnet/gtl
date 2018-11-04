@@ -1,1 +1,1 @@
-(-> x { x.(false) }).( -> y { iszero y } )
+(x. -> x false) (y. -> iszero y)
