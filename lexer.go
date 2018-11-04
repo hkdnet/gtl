@@ -37,8 +37,8 @@ const (
 
 // Token is a token of typed_lang
 type Token struct {
-	tokenType TokenType
-	text      string
+	TokenType TokenType
+	Text      string
 }
 
 var (

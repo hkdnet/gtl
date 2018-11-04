@@ -85,25 +85,25 @@ func Parse(tokens []*Token) (*AST, error) {
 }
 
 func parse(tokens []*Token, i int) (*Node, int, error) {
-	switch t := tokens[i]; t.tokenType {
+	switch t := tokens[i]; t.TokenType {
 	case EOF:
 		return nil, i + 1, nil
 	case Number:
-		if t.text == "0" {
+		if t.Text == "0" {
 			return &Node{NodeType: Zero}, i + 1, nil
 		}
-		return nil, i, fmt.Errorf("unknown number %v", t.text)
+		return nil, i, fmt.Errorf("unknown number %v", t.Text)
 	case Word:
-		if t.text == "true" {
+		if t.Text == "true" {
 			return &Node{NodeType: True}, i + 1, nil
 		}
-		if t.text == "false" {
+		if t.Text == "false" {
 			return &Node{NodeType: False}, i + 1, nil
 		}
-		if t.text == "then" || t.text == "else" {
-			return nil, i, fmt.Errorf("unexpected token %v at %d", t.text, i)
+		if t.Text == "then" || t.Text == "else" {
+			return nil, i, fmt.Errorf("unexpected token %v at %d", t.Text, i)
 		}
-		if t.text == "if" {
+		if t.Text == "if" {
 			ret := &Node{NodeType: IF, Children: make([]*Node, 3)}
 			i = i + 1
 			cond, nextIdx, err := parse(tokens, i)
@@ -112,7 +112,7 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			}
 			ret.Children[0] = cond
 			i = nextIdx
-			if thenToken := tokens[i]; thenToken.tokenType != Word || thenToken.text != "then" {
+			if thenToken := tokens[i]; thenToken.TokenType != Word || thenToken.Text != "then" {
 				return nil, i, fmt.Errorf("token at %d should be then but %v", i, thenToken)
 			}
 			i++
@@ -122,7 +122,7 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			}
 			ret.Children[1] = t
 			i = nextIdx
-			if elseToken := tokens[i]; elseToken.tokenType != Word || elseToken.text != "else" {
+			if elseToken := tokens[i]; elseToken.TokenType != Word || elseToken.Text != "else" {
 				return nil, i, fmt.Errorf("token at %d should be else but %v", i, elseToken)
 			}
 			i++
@@ -136,11 +136,11 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 		}
 
 		if i+1 >= len(tokens) {
-			return nil, i, fmt.Errorf("the last token should be eof but got word %v", t.text)
+			return nil, i, fmt.Errorf("the last token should be eof but got word %v", t.Text)
 		}
 
 		// variable name
-		switch nextToken := tokens[i+1]; nextToken.tokenType {
+		switch nextToken := tokens[i+1]; nextToken.TokenType {
 		case EOF:
 			return &Node{NodeType: Variable}, i + 1, nil
 		case Dot:
@@ -152,10 +152,10 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 
 			def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
 			for i+1 < len(tokens) {
-				if tokens[i].tokenType == Arrow {
+				if tokens[i].TokenType == Arrow {
 					break
 				}
-				if tokens[i].tokenType == Word && tokens[i+1].tokenType == Dot {
+				if tokens[i].TokenType == Word && tokens[i+1].TokenType == Dot {
 					def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
 					i += 2
 					continue

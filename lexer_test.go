@@ -6,8 +6,8 @@ func (t *Token) isEqual(other *Token) bool {
 	if t == nil {
 		return other == nil
 	}
-	return t.tokenType == other.tokenType &&
-		t.text == other.text
+	return t.TokenType == other.TokenType &&
+		t.Text == other.Text
 }
 
 func TestNextToken(t *testing.T) {
