@@ -78,6 +78,11 @@ func parse(tokens []Token, i int) (*Node, int, error) {
 	switch t := tokens[i]; t.tokenType {
 	case EOF:
 		return nil, i + 1, nil
+	case Number:
+		if t.text == "0" {
+			return &Node{nodeType: Zero}, i + 1, nil
+		}
+		return nil, i, fmt.Errorf("unknown number %v", t.text)
 	case Word:
 		if t.text == "true" {
 			return &Node{nodeType: True}, i + 1, nil

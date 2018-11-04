@@ -31,6 +31,8 @@ const (
 	Arrow
 	// Dot is "."
 	Dot
+	// Number is "0"
+	Number
 )
 
 // Token is a token of typed_lang
@@ -93,6 +95,10 @@ func (l *Lexer) NextToken() (*Token, error) {
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ".":
 		mode = Dot
+		l.cur++
+		return &Token{mode, l.source[beg : beg+1]}, nil
+	case c == "0":
+		mode = Number
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == "-":
