@@ -49,7 +49,7 @@ func Parse(tokens []Token) (*AST, error) {
 		switch t := tokens[i]; t.tokenType {
 		case EOF:
 			break
-		case IDENTIFIER:
+		case Word:
 			if t.text == "true" {
 				tmp.children = []*Node{
 					&Node{nodeType: TRUE},

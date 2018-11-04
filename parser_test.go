@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 	}
 
 	tokens = []Token{
-		{IDENTIFIER, "true"},
+		{Word, "true"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 	}
 
 	tokens = []Token{
-		{IDENTIFIER, "false"},
+		{Word, "false"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)

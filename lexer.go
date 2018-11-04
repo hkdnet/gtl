@@ -17,20 +17,20 @@ type TokenType uint8
 const (
 	// EOF is an end of file
 	EOF = iota
-	// IDENTIFIER is an identifier, which may be a variable name or function name, etc.
-	IDENTIFIER
-	// LPAREN is "("
-	LPAREN
-	// RPAREN is ")"
-	RPAREN
-	// LBLACE is "{"
-	LBLACE
-	// RBLACE is "}"
-	RBLACE
-	// ARROW is "->"
-	ARROW
-	// DOT is "."
-	DOT
+	// Word is an Word, which may be a variable name or function name, etc.
+	Word
+	// LParen is "("
+	LParen
+	// RParen is ")"
+	RParen
+	// LBlace is "{"
+	LBlace
+	// RBlace is "}"
+	RBlace
+	// Arrow is "->"
+	Arrow
+	// Dot is "."
+	Dot
 )
 
 // Token is a token of typed_lang
@@ -67,7 +67,7 @@ func (l *Lexer) NextToken() (*Token, error) {
 		l.cur++
 		return l.NextToken()
 	case strings.Contains("abcdefghijklmnopqrstuvwxyz", c):
-		mode = IDENTIFIER
+		mode = Word
 		for ; idx < len(l.source); idx++ {
 			if l.source[idx:idx+1] == " " {
 				break
@@ -76,29 +76,29 @@ func (l *Lexer) NextToken() (*Token, error) {
 		l.cur = idx
 		return &Token{mode, l.source[beg:idx]}, nil
 	case c == "(":
-		mode = LPAREN
+		mode = LParen
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ")":
-		mode = RPAREN
+		mode = RParen
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == "{":
-		mode = LBLACE
+		mode = LBlace
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == "}":
-		mode = RBLACE
+		mode = RBlace
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ".":
-		mode = DOT
+		mode = Dot
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == "-":
 		if l.source[idx+1:idx+2] == ">" {
 			l.cur += 2
-			return &Token{ARROW, l.source[beg : beg+2]}, nil
+			return &Token{Arrow, l.source[beg : beg+2]}, nil
 		}
 	}
 

@@ -18,19 +18,19 @@ func TestNextToken(t *testing.T) {
 	}
 	testcases := []testcase{
 		{"", &Token{EOF, ""}, 0},
-		{"a", &Token{IDENTIFIER, "a"}, 1},
-		{"ab", &Token{IDENTIFIER, "ab"}, 2},
-		{"a b", &Token{IDENTIFIER, "a"}, 1},
-		{"(", &Token{LPAREN, "("}, 1},
-		{"(a", &Token{LPAREN, "("}, 1},
-		{")", &Token{RPAREN, ")"}, 1},
-		{" )", &Token{RPAREN, ")"}, 2},
-		{"{", &Token{LBLACE, "{"}, 1},
-		{"{a", &Token{LBLACE, "{"}, 1},
-		{"}", &Token{RBLACE, "}"}, 1},
-		{" }", &Token{RBLACE, "}"}, 2},
-		{"->", &Token{ARROW, "->"}, 2},
-		{".", &Token{DOT, "."}, 1},
+		{"a", &Token{Word, "a"}, 1},
+		{"ab", &Token{Word, "ab"}, 2},
+		{"a b", &Token{Word, "a"}, 1},
+		{"(", &Token{LParen, "("}, 1},
+		{"(a", &Token{LParen, "("}, 1},
+		{")", &Token{RParen, ")"}, 1},
+		{" )", &Token{RParen, ")"}, 2},
+		{"{", &Token{LBlace, "{"}, 1},
+		{"{a", &Token{LBlace, "{"}, 1},
+		{"}", &Token{RBlace, "}"}, 1},
+		{" }", &Token{RBlace, "}"}, 2},
+		{"->", &Token{Arrow, "->"}, 2},
+		{".", &Token{Dot, "."}, 1},
 	}
 	for i, v := range testcases {
 		l := NewLexer(v.src)
