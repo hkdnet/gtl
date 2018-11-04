@@ -27,14 +27,6 @@ type Token struct {
 
 var ErrUnknownToken = errors.New("Unknown token")
 
-func (t *Token) IsEqual(other *Token) bool {
-	if t == nil {
-		return other == nil
-	}
-	return t.tokenType == other.tokenType &&
-		t.text == other.text
-}
-
 func NewLexer(source string) *Lexer {
 	return &Lexer{source, 0}
 }

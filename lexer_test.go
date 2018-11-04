@@ -2,6 +2,14 @@ package gtl
 
 import "testing"
 
+func (t *Token) isEqual(other *Token) bool {
+	if t == nil {
+		return other == nil
+	}
+	return t.tokenType == other.tokenType &&
+		t.text == other.text
+}
+
 func TestNextToken(t *testing.T) {
 	type testcase struct {
 		src      string
@@ -26,7 +34,7 @@ func TestNextToken(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if !got.IsEqual(v.want) {
+		if !got.isEqual(v.want) {
 			t.Errorf("case %d: want %#v but got %#v\n", i, v.want, got)
 		}
 		if l.cur != v.curAfter {
