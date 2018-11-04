@@ -7,7 +7,7 @@ import (
 
 // AST is a abstract syntax tree. It contains only one Program Node.
 type AST struct {
-	child *Node
+	Child *Node
 }
 
 // NodeType is an enum for node.
@@ -15,8 +15,8 @@ type NodeType uint8
 
 // Node has nodeType and children
 type Node struct {
-	nodeType NodeType
-	children []*Node
+	NodeType NodeType
+	Children []*Node
 }
 
 const (
@@ -51,11 +51,11 @@ const (
 
 // IsNumericalValue returns whether a node is a numerical value or not.
 func (n *Node) IsNumericalValue() bool {
-	if n.nodeType == Zero {
+	if n.NodeType == Zero {
 		return true
 	}
-	if n.nodeType == Succ {
-		c := n.children[0]
+	if n.NodeType == Succ {
+		c := n.Children[0]
 		return c.IsNumericalValue()
 	}
 	return false
@@ -63,7 +63,7 @@ func (n *Node) IsNumericalValue() bool {
 
 // IsValue returns whether a node is a value or not.
 func (n *Node) IsValue() bool {
-	if n.nodeType == True || n.nodeType == False {
+	if n.NodeType == True || n.NodeType == False {
 		return true
 	}
 	return n.IsNumericalValue()
@@ -72,15 +72,15 @@ func (n *Node) IsValue() bool {
 // Parse returns an AST for tokens.
 func Parse(tokens []*Token) (*AST, error) {
 	var tmp *Node
-	tmp = &Node{nodeType: Program}
-	ret := &AST{child: tmp}
+	tmp = &Node{NodeType: Program}
+	ret := &AST{Child: tmp}
 
 	t, _, err := parse(tokens, 0)
 	if err != nil {
 		return nil, err
 	}
 	// TODO: if nextIdx != len(tokens check ?
-	tmp.children = []*Node{t}
+	tmp.Children = []*Node{t}
 	return ret, nil
 }
 
@@ -90,27 +90,27 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 		return nil, i + 1, nil
 	case Number:
 		if t.text == "0" {
-			return &Node{nodeType: Zero}, i + 1, nil
+			return &Node{NodeType: Zero}, i + 1, nil
 		}
 		return nil, i, fmt.Errorf("unknown number %v", t.text)
 	case Word:
 		if t.text == "true" {
-			return &Node{nodeType: True}, i + 1, nil
+			return &Node{NodeType: True}, i + 1, nil
 		}
 		if t.text == "false" {
-			return &Node{nodeType: False}, i + 1, nil
+			return &Node{NodeType: False}, i + 1, nil
 		}
 		if t.text == "then" || t.text == "else" {
 			return nil, i, fmt.Errorf("unexpected token %v at %d", t.text, i)
 		}
 		if t.text == "if" {
-			ret := &Node{nodeType: IF, children: make([]*Node, 3)}
+			ret := &Node{NodeType: IF, Children: make([]*Node, 3)}
 			i = i + 1
 			cond, nextIdx, err := parse(tokens, i)
 			if err != nil {
 				return nil, i, err
 			}
-			ret.children[0] = cond
+			ret.Children[0] = cond
 			i = nextIdx
 			if thenToken := tokens[i]; thenToken.tokenType != Word || thenToken.text != "then" {
 				return nil, i, fmt.Errorf("token at %d should be then but %v", i, thenToken)
@@ -120,7 +120,7 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			if err != nil {
 				return nil, i, err
 			}
-			ret.children[1] = t
+			ret.Children[1] = t
 			i = nextIdx
 			if elseToken := tokens[i]; elseToken.tokenType != Word || elseToken.text != "else" {
 				return nil, i, fmt.Errorf("token at %d should be else but %v", i, elseToken)
@@ -130,7 +130,7 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			if err != nil {
 				return nil, i, err
 			}
-			ret.children[2] = f
+			ret.Children[2] = f
 			i = nextIdx
 			return ret, i, nil
 		}
@@ -142,21 +142,21 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 		// variable name
 		switch nextToken := tokens[i+1]; nextToken.tokenType {
 		case EOF:
-			return &Node{nodeType: Variable}, i + 1, nil
+			return &Node{NodeType: Variable}, i + 1, nil
 		case Dot:
 			i += 2
 
-			def := &Node{nodeType: LambdaDef}
-			body := &Node{nodeType: LambdaBody}
-			ret := &Node{nodeType: Lambda, children: []*Node{def, body}}
+			def := &Node{NodeType: LambdaDef}
+			body := &Node{NodeType: LambdaBody}
+			ret := &Node{NodeType: Lambda, Children: []*Node{def, body}}
 
-			def.children = append(def.children, &Node{nodeType: LambdaParam}) // TODO: parameter name?
+			def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
 			for i+1 < len(tokens) {
 				if tokens[i].tokenType == Arrow {
 					break
 				}
 				if tokens[i].tokenType == Word && tokens[i+1].tokenType == Dot {
-					def.children = append(def.children, &Node{nodeType: LambdaParam}) // TODO: parameter name?
+					def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
 					i += 2
 					continue
 				}
@@ -169,7 +169,7 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			if err != nil {
 				return nil, nextIdx, err
 			}
-			body.children = []*Node{bc}
+			body.Children = []*Node{bc}
 
 			return ret, nextIdx, nil
 		}

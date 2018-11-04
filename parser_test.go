@@ -15,10 +15,10 @@ func TestParse(t *testing.T) {
 		if ast == nil {
 			t.Fatal("ast should not be nil")
 		}
-		if ast.child == nil {
+		if ast.Child == nil {
 			t.Fatal("ast should have child")
 		}
-		if want, got := Program, ast.child.nodeType; got != want {
+		if want, got := Program, ast.Child.NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	}
@@ -31,11 +31,11 @@ func TestParse(t *testing.T) {
 	ast, err = Parse(tokens)
 
 	assertValidAST(ast)
-	program = ast.child
-	if want, got := 1, len(program.children); got != want {
+	program = ast.Child
+	if want, got := 1, len(program.Children); got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := True, program.children[0].nodeType; got != want {
+	if want, got := True, program.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -46,11 +46,11 @@ func TestParse(t *testing.T) {
 	ast, err = Parse(tokens)
 
 	assertValidAST(ast)
-	program = ast.child
-	if want, got := 1, len(program.children); got != want {
+	program = ast.Child
+	if want, got := 1, len(program.Children); got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := False, program.children[0].nodeType; got != want {
+	if want, got := False, program.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -61,11 +61,11 @@ func TestParse(t *testing.T) {
 	ast, err = Parse(tokens)
 
 	assertValidAST(ast)
-	program = ast.child
-	if want, got := 1, len(program.children); got != want {
+	program = ast.Child
+	if want, got := 1, len(program.Children); got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Zero, program.children[0].nodeType; got != want {
+	if want, got := Zero, program.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -82,14 +82,14 @@ func TestParse(t *testing.T) {
 	ast, err = Parse(tokens)
 
 	assertValidAST(ast)
-	program = ast.child
-	if want, got := 1, len(program.children); got != want {
+	program = ast.Child
+	if want, got := 1, len(program.Children); got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := IF, program.children[0].nodeType; got != want {
+	if want, got := IF, program.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := True, program.children[0].children[0].nodeType; got != want {
+	if want, got := True, program.Children[0].Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -104,34 +104,34 @@ func TestParse(t *testing.T) {
 	ast, err = Parse(tokens)
 
 	assertValidAST(ast)
-	program = ast.child
-	if want, got := 1, len(program.children); got != want {
+	program = ast.Child
+	if want, got := 1, len(program.Children); got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Lambda, program.children[0].nodeType; got != want {
+	if want, got := Lambda, program.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 	{
-		def := program.children[0].children[0]
-		body := program.children[0].children[1]
-		if want, got := LambdaDef, def.nodeType; got != want {
+		def := program.Children[0].Children[0]
+		body := program.Children[0].Children[1]
+		if want, got := LambdaDef, def.NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
-		if want, got := LambdaBody, body.nodeType; got != want {
-			t.Errorf("want %v but got %v\n", want, got)
-		}
-
-		if want, got := 1, len(def.children); got != want {
-			t.Errorf("want %v but got %v\n", want, got)
-		}
-		if want, got := LambdaParam, def.children[0].nodeType; got != want {
+		if want, got := LambdaBody, body.NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 
-		if want, got := 1, len(body.children); got != want {
+		if want, got := 1, len(def.Children); got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
-		if want, got := Variable, body.children[0].nodeType; got != want {
+		if want, got := LambdaParam, def.Children[0].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+
+		if want, got := 1, len(body.Children); got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := Variable, body.Children[0].NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	}
