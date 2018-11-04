@@ -85,7 +85,6 @@ func Parse(tokens []*Token) (*AST, error) {
 }
 
 func parse(tokens []*Token, i int) (*Node, int, error) {
-	fmt.Printf("DEBUG: %d\n", i)
 	switch t := tokens[i]; t.tokenType {
 	case EOF:
 		return nil, i + 1, nil
