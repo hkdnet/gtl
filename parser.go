@@ -36,6 +36,17 @@ const (
 	Pred
 	// IsZero is a builtin function, iszero
 	IsZero
+	// Variable is a variable
+	// TODO: better comment ...
+	Variable
+	// Lambda is a function. a lambda's children are always [LambdaDef, LambdaBody]
+	Lambda
+	// LambdaDef has some LambdaParams
+	LambdaDef
+	// LambdaParam represents a parameter of Lambda
+	LambdaParam
+	// LambdaBody has single child
+	LambdaBody
 )
 
 // IsNumericalValue returns whether a node is a numerical value or not.
@@ -90,6 +101,9 @@ func parse(tokens []Token, i int) (*Node, int, error) {
 		if t.text == "false" {
 			return &Node{nodeType: False}, i + 1, nil
 		}
+		if t.text == "then" || t.text == "else" {
+			return nil, i, fmt.Errorf("unexpected token %v at %d", t.text, i)
+		}
 		if t.text == "if" {
 			ret := &Node{nodeType: IF, children: make([]*Node, 3)}
 			i = i + 1
@@ -121,6 +135,46 @@ func parse(tokens []Token, i int) (*Node, int, error) {
 			i = nextIdx
 			return ret, i, nil
 		}
+
+		if i+1 >= len(tokens) {
+			return nil, i, fmt.Errorf("the last token should be eof but got word %v", t.text)
+		}
+
+		// variable name
+		switch nextToken := tokens[i+1]; nextToken.tokenType {
+		case EOF:
+			return &Node{nodeType: Variable}, i + 1, nil
+		case Dot:
+			i += 2
+
+			def := &Node{nodeType: LambdaDef}
+			body := &Node{nodeType: LambdaBody}
+			ret := &Node{nodeType: Lambda, children: []*Node{def, body}}
+
+			def.children = append(def.children, &Node{nodeType: LambdaParam}) // TODO: parameter name?
+			for i+1 < len(tokens) {
+				if tokens[i].tokenType == Arrow {
+					break
+				}
+				if tokens[i].tokenType == Word && tokens[i+1].tokenType == Dot {
+					def.children = append(def.children, &Node{nodeType: LambdaParam}) // TODO: parameter name?
+					i += 2
+					continue
+				}
+				return nil, i, fmt.Errorf("invalid lambda definition at %d-%d", i, i+1)
+			}
+
+			i++ // skip arrow
+
+			bc, nextIdx, err := parse(tokens, i)
+			if err != nil {
+				return nil, nextIdx, err
+			}
+			body.children = []*Node{bc}
+
+			return ret, nextIdx, nil
+		}
+
 	}
 
 	return nil, i, errors.New("cannot parse")

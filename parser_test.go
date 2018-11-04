@@ -92,4 +92,47 @@ func TestParse(t *testing.T) {
 	if want, got := True, program.children[0].children[0].nodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
+
+	// case lambda
+	tokens = []Token{
+		{Word, "a"},
+		{Dot, "."},
+		{Arrow, "->"},
+		{Word, "a"},
+		{EOF, ""},
+	}
+	ast, err = Parse(tokens)
+
+	assertValidAST(ast)
+	program = ast.child
+	if want, got := 1, len(program.children); got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Lambda, program.children[0].nodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	{
+		def := program.children[0].children[0]
+		body := program.children[0].children[1]
+		if want, got := LambdaDef, def.nodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := LambdaBody, body.nodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+
+		if want, got := 1, len(def.children); got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := LambdaParam, def.children[0].nodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+
+		if want, got := 1, len(body.children); got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := Variable, body.children[0].nodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	}
 }
