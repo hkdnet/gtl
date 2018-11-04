@@ -79,7 +79,7 @@ func (l *Lexer) NextToken() (*Token, error) {
 			if isWhitespace(c) {
 				break
 			}
-			if c == "(" || c == ")" {
+			if c == "(" || c == ")" || c == "." {
 				break
 			}
 		}
