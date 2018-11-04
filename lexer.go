@@ -51,6 +51,10 @@ func NewLexer(source string) *Lexer {
 	return &Lexer{source, 0}
 }
 
+func (l *Lexer) HasNext() bool {
+	return l.cur < len(l.source)
+}
+
 // NextToken returns a next token, and increments its cursor
 func (l *Lexer) NextToken() (*Token, error) {
 	beg := l.cur
