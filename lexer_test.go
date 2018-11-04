@@ -25,6 +25,10 @@ func TestNextToken(t *testing.T) {
 		{"(a", &Token{LPAREN, "("}, 1},
 		{")", &Token{RPAREN, ")"}, 1},
 		{" )", &Token{RPAREN, ")"}, 2},
+		{"{", &Token{LBLACE, "{"}, 1},
+		{"{a", &Token{LBLACE, "{"}, 1},
+		{"}", &Token{RBLACE, "}"}, 1},
+		{" }", &Token{RBLACE, "}"}, 2},
 		{"->", &Token{ARROW, "->"}, 2},
 		{".", &Token{DOT, "."}, 1},
 	}

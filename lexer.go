@@ -23,6 +23,10 @@ const (
 	LPAREN
 	// RPAREN is ")"
 	RPAREN
+	// LBLACE is "{"
+	LBLACE
+	// RBLACE is "}"
+	RBLACE
 	// ARROW is "->"
 	ARROW
 	// DOT is "."
@@ -77,6 +81,14 @@ func (l *Lexer) NextToken() (*Token, error) {
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ")":
 		mode = RPAREN
+		l.cur++
+		return &Token{mode, l.source[beg : beg+1]}, nil
+	case c == "{":
+		mode = LBLACE
+		l.cur++
+		return &Token{mode, l.source[beg : beg+1]}, nil
+	case c == "}":
+		mode = RBLACE
 		l.cur++
 		return &Token{mode, l.source[beg : beg+1]}, nil
 	case c == ".":
