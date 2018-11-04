@@ -5,28 +5,40 @@ import (
 	"fmt"
 )
 
+// AST is a abstract syntax tree. It contains only one Program Node.
 type AST struct {
 	child *Node
 }
 
+// NodeType is an enum for node.
 type NodeType uint8
 
+// Node has nodeType and children
 type Node struct {
 	nodeType NodeType
 	children []*Node
 }
 
 const (
+	// Program is a toplevel node
 	Program NodeType = iota
+	// True is literal true
 	True
+	// False is literal false
 	False
+	// IF is a if expression
 	IF
+	// Zero is literal 0
 	Zero
+	// Succ is a builtin function, succ
 	Succ
+	// Pred is a builtin function, pred
 	Pred
+	// IsZero is a builtin function, iszero
 	IsZero
 )
 
+// IsNumericalValue returns whether a node is a numerical value or not.
 func (n *Node) IsNumericalValue() bool {
 	if n.nodeType == Zero {
 		return true
@@ -38,6 +50,7 @@ func (n *Node) IsNumericalValue() bool {
 	return false
 }
 
+// IsValue returns whether a node is a value or not.
 func (n *Node) IsValue() bool {
 	if n.nodeType == True || n.nodeType == False {
 		return true
@@ -45,6 +58,7 @@ func (n *Node) IsValue() bool {
 	return n.IsNumericalValue()
 }
 
+// Parse returns an AST for tokens.
 func Parse(tokens []Token) (*AST, error) {
 	var tmp *Node
 	tmp = &Node{nodeType: Program}

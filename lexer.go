@@ -17,7 +17,7 @@ type TokenType uint8
 const (
 	// EOF is an end of file
 	EOF = iota
-	// Word is an Word, which may be a variable name or function name, etc.
+	// Word is an Word, which may be a variable name, function name, or keyword such as if, etc.
 	Word
 	// LParen is "("
 	LParen
