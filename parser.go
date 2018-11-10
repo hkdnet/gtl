@@ -70,13 +70,18 @@ func (n *Node) IsValue() bool {
 	return n.IsNumericalValue()
 }
 
+type parseEnvironemnt struct {
+	idx int
+}
+
 // Parse returns an AST for tokens.
 func Parse(tokens []*Token) (*AST, error) {
 	var tmp *Node
 	tmp = &Node{NodeType: Program}
 	ret := &AST{Child: tmp}
 
-	t, _, err := parse(tokens, 0)
+	var env parseEnvironemnt
+	t, _, err := parse(tokens, env)
 	if err != nil {
 		return nil, err
 	}
@@ -85,102 +90,121 @@ func Parse(tokens []*Token) (*AST, error) {
 	return ret, nil
 }
 
-func parse(tokens []*Token, i int) (*Node, int, error) {
-	switch t := tokens[i]; t.TokenType {
+func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvironemnt, err error) {
+	env = _env
+	switch t := tokens[env.idx]; t.TokenType {
 	case EOF:
-		return nil, i + 1, nil
+		env.idx++
+		return
 	case Number:
 		if t.Text == "0" {
-			return &Node{NodeType: Zero}, i + 1, nil
+			env.idx++
+			ret = &Node{NodeType: Zero}
+			return
 		}
-		return nil, i, fmt.Errorf("unknown number %v", t.Text)
+		err = fmt.Errorf("unknown number %v", t.Text)
+		return
 	case Word:
 		if t.Text == "true" {
-			return &Node{NodeType: True}, i + 1, nil
+			env.idx++
+			ret = &Node{NodeType: True}
+			return
 		}
 		if t.Text == "false" {
-			return &Node{NodeType: False}, i + 1, nil
+			env.idx++
+			ret = &Node{NodeType: False}
+			return
 		}
 		if t.Text == "then" || t.Text == "else" {
-			return nil, i, fmt.Errorf("unexpected token %v at %d", t.Text, i)
+			err = fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
+			return
 		}
 		if t.Text == "if" {
-			ret := &Node{NodeType: IF, Children: make([]*Node, 3)}
-			i = i + 1
-			cond, nextIdx, err := parse(tokens, i)
+			ret = &Node{NodeType: IF, Children: make([]*Node, 3)}
+			env.idx++
+			var cond *Node
+			var truePart *Node
+			var falsePart *Node
+			cond, env, err = parse(tokens, env)
 			if err != nil {
-				return nil, i, err
+				return
 			}
 			ret.Children[0] = cond
-			i = nextIdx
-			if thenToken := tokens[i]; thenToken.TokenType != Word || thenToken.Text != "then" {
-				return nil, i, fmt.Errorf("token at %d should be then but %v", i, thenToken)
+			if thenToken := tokens[env.idx]; thenToken.TokenType != Word || thenToken.Text != "then" {
+				err = fmt.Errorf("token at %d should be then but %v", env.idx, thenToken)
+				return
 			}
-			i++
-			t, nextIdx, err := parse(tokens, i)
+			env.idx++
+			truePart, env, err = parse(tokens, env)
 			if err != nil {
-				return nil, i, err
+				return
 			}
-			ret.Children[1] = t
-			i = nextIdx
-			if elseToken := tokens[i]; elseToken.TokenType != Word || elseToken.Text != "else" {
-				return nil, i, fmt.Errorf("token at %d should be else but %v", i, elseToken)
+			ret.Children[1] = truePart
+			if elseToken := tokens[env.idx]; elseToken.TokenType != Word || elseToken.Text != "else" {
+				err = fmt.Errorf("token at %d should be else but %v", env.idx, elseToken)
+				return
 			}
-			i++
-			f, nextIdx, err := parse(tokens, i)
+			env.idx++
+			falsePart, env, err = parse(tokens, env)
 			if err != nil {
-				return nil, i, err
+				return
 			}
-			ret.Children[2] = f
-			i = nextIdx
-			return ret, i, nil
+			ret.Children[2] = falsePart
+			env.idx++
+			return
 		}
 
-		if i+1 >= len(tokens) {
-			return nil, i, fmt.Errorf("the last token should be eof but got word %v", t.Text)
+		if env.idx+1 >= len(tokens) {
+			err = fmt.Errorf("the last token should be eof but got word %v", t.Text)
+			return
 		}
 
 		// variable name
-		switch nextToken := tokens[i+1]; nextToken.TokenType {
+		switch nextToken := tokens[env.idx+1]; nextToken.TokenType {
 		case EOF:
-			return &Node{NodeType: Variable}, i + 1, nil
+			env.idx++
+			ret = &Node{NodeType: Variable}
+			return
 		case Dot:
-			i += 2
+			env.idx += 2
 
 			def := &Node{NodeType: LambdaDef}
 			body := &Node{NodeType: LambdaBody}
-			ret := &Node{NodeType: Lambda, Children: []*Node{def, body}}
+			ret = &Node{NodeType: Lambda, Children: []*Node{def, body}}
 
 			def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
-			for i+1 < len(tokens) {
-				if tokens[i].TokenType == Arrow {
+			for env.idx+1 < len(tokens) {
+				if tokens[env.idx].TokenType == Arrow {
 					break
 				}
-				if tokens[i].TokenType == Word && tokens[i+1].TokenType == Dot {
+				if tokens[env.idx].TokenType == Word && tokens[env.idx+1].TokenType == Dot {
 					def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
-					i += 2
+					env.idx += 2
 					continue
 				}
-				return nil, i, fmt.Errorf("invalid lambda definition at %d-%d", i, i+1)
+				err = fmt.Errorf("invalid lambda definition at %d-%d", env.idx, env.idx+1)
+				return
 			}
 
-			i++ // skip arrow
+			env.idx++ // skip arrow
 
-			bc, nextIdx, err := parse(tokens, i)
+			var bc *Node
+			bc, env, err = parse(tokens, env)
 			if err != nil {
-				return nil, nextIdx, err
+				return
 			}
 			body.Children = []*Node{bc}
 
-			return ret, nextIdx, nil
+			return
 		case Word: // TODO: is this only apply?
-			i += 2
+			env.idx += 2
 			children := []*Node{}
-			ret := &Node{NodeType: Apply, Children: children}
-			return ret, i, nil
+			ret = &Node{NodeType: Apply, Children: children}
+			return
 		}
 
 	}
 
-	return nil, i, fmt.Errorf("cannot parse at %d", i)
+	err = fmt.Errorf("cannot parse at %d", env.idx)
+	return
 }
