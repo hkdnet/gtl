@@ -1,6 +1,9 @@
 package gtl
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestParse(t *testing.T) {
 	var tokens []*Token
@@ -201,7 +204,28 @@ func Test_parseWord(t *testing.T) {
 	if want, got := 4, env.idx; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Apply, node.NodeType; got != got {
+	if want, got := Apply, node.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	fmt.Printf("%v\n", node.Children)
+	if want, got := "d", node.Children[1].Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	node = node.Children[0]
+	if want, got := Apply, node.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "c", node.Children[1].Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	node = node.Children[0]
+	if want, got := Apply, node.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "b", node.Children[1].Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "a", node.Children[0].Name; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 }

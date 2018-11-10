@@ -16,6 +16,8 @@ type NodeType uint8
 type Node struct {
 	NodeType NodeType
 	Children []*Node
+
+	Name string // for Variable, LambdaParam
 }
 
 const (
@@ -218,8 +220,7 @@ paramLoop:
 		if afterDot.TokenType != Word {
 			return nil, env, fmt.Errorf("after dot, there should be a variable but got %v at %d", afterDot, i+1)
 		}
-		// TODO: parameter name?
-		def.Children = append(def.Children, &Node{NodeType: LambdaParam})
+		def.Children = append(def.Children, &Node{NodeType: LambdaParam, Name: afterDot.Text})
 		if len(tokens) <= i+1 {
 			return nil, env, fmt.Errorf("after a parameter, there should be a dot or arrow but nothing at %d", i+1)
 		}
@@ -249,12 +250,11 @@ paramLoop:
 // a b c d -> ((a b) c) d
 func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
 	if nt := tokens[env.idx+1]; nt.TokenType == EOF || nt.TokenType == RParen {
+		ret := &Node{NodeType: Variable, Name: tokens[env.idx].Text}
 		env.idx++
-		return &Node{NodeType: Variable}, env, nil
+		return ret, env, nil
 	}
-	ret := &Node{NodeType: Apply}
-	ret.Children = make([]*Node, 2)
-	ret.Children[0] = &Node{NodeType: Variable}
+	words := []*Token{tokens[env.idx]}
 	env.idx++
 applyLoop:
 	for i := env.idx; ; {
@@ -263,16 +263,27 @@ applyLoop:
 			env.idx = i
 			break applyLoop
 		case Word:
-			l := ret.Children[0]
-			r := &Node{NodeType: Variable}
-			ret.Children[0] = &Node{
-				NodeType: Apply,
-				Children: []*Node{l, r},
-			}
+			words = append(words, tokens[i])
 			i++
 		default:
 			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
 		}
 	}
-	return ret, env, nil
+	var app *Node
+	for i, l := 1, len(words); i < l; i++ {
+		v := &Node{NodeType: Variable, Name: words[i].Text}
+		if app == nil { // 1st
+			first := &Node{NodeType: Variable, Name: words[0].Text}
+			app = &Node{
+				NodeType: Apply,
+				Children: []*Node{first, v},
+			}
+		} else {
+			app = &Node{
+				NodeType: Apply,
+				Children: []*Node{app, v},
+			}
+		}
+	}
+	return app, env, nil
 }
