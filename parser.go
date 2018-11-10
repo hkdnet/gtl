@@ -122,6 +122,8 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 		case "if":
 			return parseIf(tokens, env)
 		}
+	case Dot: // start param
+		return parseDot(tokens, env)
 	case Word:
 		if env.idx+1 >= len(tokens) {
 			err = fmt.Errorf("the last token should be eof but got word %v", t.Text)
@@ -142,37 +144,6 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 		case EOF:
 			env.idx++
 			ret = &Node{NodeType: Variable}
-			return
-		case Dot:
-			env.idx += 2
-
-			def := &Node{NodeType: LambdaDef}
-			body := &Node{NodeType: LambdaBody}
-			ret = &Node{NodeType: Lambda, Children: []*Node{def, body}}
-
-			def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
-			for env.idx+1 < len(tokens) {
-				if tokens[env.idx].TokenType == Arrow {
-					break
-				}
-				if tokens[env.idx].TokenType == Word && tokens[env.idx+1].TokenType == Dot {
-					def.Children = append(def.Children, &Node{NodeType: LambdaParam}) // TODO: parameter name?
-					env.idx += 2
-					continue
-				}
-				err = fmt.Errorf("invalid lambda definition at %d-%d", env.idx, env.idx+1)
-				return
-			}
-
-			env.idx++ // skip arrow
-
-			var bc *Node
-			bc, env, err = parse(tokens, env)
-			if err != nil {
-				return
-			}
-			body.Children = []*Node{bc}
-
 			return
 		case Word: // TODO: is this only apply?
 			env.idx += 2
@@ -247,4 +218,45 @@ func parseIf(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, er
 	}
 	ret.Children[2] = falsePart
 	return ret, env, err
+}
+
+// .x .y -> x y
+func parseDot(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	def := &Node{NodeType: LambdaDef}
+	body := &Node{NodeType: LambdaBody}
+	ret := &Node{NodeType: Lambda, Children: []*Node{def, body}}
+paramLoop:
+	for i := env.idx; ; {
+		if len(tokens) <= i+1 {
+			return nil, env, fmt.Errorf("after dot, there should be a variable but nothing at %d", i+1)
+		}
+		afterDot := tokens[i+1]
+		if afterDot.TokenType != Word {
+			return nil, env, fmt.Errorf("after dot, there should be a variable but got %v at %d", afterDot, i+1)
+		}
+		// TODO: parameter name?
+		def.Children = append(def.Children, &Node{NodeType: LambdaParam})
+		if len(tokens) <= i+1 {
+			return nil, env, fmt.Errorf("after a parameter, there should be a dot or arrow but nothing at %d", i+1)
+		}
+		i++ // skip parameter token
+		dotOrArrow := tokens[i+1]
+		switch dotOrArrow.TokenType {
+		case Arrow:
+			env.idx = i + 2 // skip arrow
+			break paramLoop
+		case Dot:
+			i++
+		default:
+			return nil, env, fmt.Errorf("after a parameter, there should be a dot or arrow but got %v at %d", dotOrArrow, i+1)
+		}
+	}
+
+	bc, env, err := parse(tokens, env)
+	if err != nil {
+		return nil, env, err
+	}
+	body.Children = []*Node{bc}
+
+	return ret, env, nil
 }

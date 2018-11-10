@@ -9,9 +9,6 @@ func TestParse(t *testing.T) {
 	var program *Node
 
 	assertValidAST := func(ast *AST) {
-		if err != nil {
-			t.Fatal(err)
-		}
 		if ast == nil {
 			t.Fatal("ast should not be nil")
 		}
@@ -29,6 +26,9 @@ func TestParse(t *testing.T) {
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assertValidAST(ast)
 	program = ast.Child
@@ -44,6 +44,9 @@ func TestParse(t *testing.T) {
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assertValidAST(ast)
 	program = ast.Child
@@ -59,6 +62,9 @@ func TestParse(t *testing.T) {
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assertValidAST(ast)
 	program = ast.Child
@@ -80,6 +86,9 @@ func TestParse(t *testing.T) {
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assertValidAST(ast)
 	program = ast.Child
@@ -95,13 +104,16 @@ func TestParse(t *testing.T) {
 
 	// case lambda
 	tokens = []*Token{
-		{Word, "a"},
 		{Dot, "."},
+		{Word, "a"},
 		{Arrow, "->"},
 		{Word, "a"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	assertValidAST(ast)
 	program = ast.Child
@@ -134,5 +146,26 @@ func TestParse(t *testing.T) {
 		if want, got := Variable, body.Children[0].NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
+	}
+}
+
+func Test_parseDot(t *testing.T) {
+	var env parseEnvironemnt
+	tokens := []*Token{
+		{Dot, "."},
+		{Word, "a"},
+		{Arrow, "->"},
+		{Word, "a"},
+		{EOF, ""},
+	}
+	node, env, err := parseDot(tokens, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want, got := 4, env.idx; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Lambda, node.NodeType; got != got {
+		t.Errorf("want %v but got %v\n", want, got)
 	}
 }
