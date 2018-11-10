@@ -34,6 +34,11 @@ func TestNextToken(t *testing.T) {
 		{"->", &Token{Arrow, "->"}, 2},
 		{".", &Token{Dot, "."}, 1},
 		{"0", &Token{Number, "0"}, 1},
+		{"true", &Token{Keyword, "true"}, 4},
+		{"false", &Token{Keyword, "false"}, 5},
+		{"if", &Token{Keyword, "if"}, 2},
+		{"then", &Token{Keyword, "then"}, 4},
+		{"else", &Token{Keyword, "else"}, 4},
 	}
 	for i, v := range testcases {
 		l := NewLexer(v.src)

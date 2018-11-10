@@ -33,6 +33,8 @@ const (
 	Dot
 	// Number is "0"
 	Number
+	// Keyword is one of "true"
+	Keyword
 )
 
 // Token is a token of typed_lang
@@ -74,6 +76,14 @@ func (l *Lexer) NextToken() (*Token, error) {
 		l.cur++
 		return l.NextToken()
 	case strings.Contains("abcdefghijklmnopqrstuvwxyz", c):
+		// keywords
+		keywords := []string{"true", "false", "if", "then", "else"}
+		for _, kw := range keywords {
+			if size := len(kw); len(l.source) >= idx+size && l.source[idx:idx+size] == kw {
+				l.cur += size
+				return &Token{Keyword, l.source[idx : idx+size]}, nil
+			}
+		}
 		mode = Word
 		for ; idx < len(l.source); idx++ {
 			c := l.source[idx : idx+1]
