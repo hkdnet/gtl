@@ -147,6 +147,21 @@ func TestParse(t *testing.T) {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	}
+
+	tokens = []*Token{
+		{LParen, "("},
+		{Dot, "."},
+		{Word, "a"},
+		{Arrow, "->"},
+		{Word, "a"},
+		{RParen, ")"},
+		{EOF, ""},
+	}
+	ast, err = Parse(tokens)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assertValidAST(ast)
 }
 
 func Test_parseDot(t *testing.T) {

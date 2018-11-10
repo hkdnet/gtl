@@ -101,8 +101,7 @@ func Parse(tokens []*Token) (*AST, error) {
 	return ret, nil
 }
 
-func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvironemnt, err error) {
-	env = _env
+func parse(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
 	switch t := tokens[env.idx]; t.TokenType {
 	case EOF:
 		return parseEOF(tokens, env)
@@ -117,8 +116,7 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 		case "false":
 			return parseFalse(tokens, env)
 		case "then", "else":
-			err = fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
-			return nil, env, nil
+			return nil, env, fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
 		case "if":
 			return parseIf(tokens, env)
 		}
@@ -128,8 +126,7 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 		return parseWord(tokens, env)
 	}
 
-	err = fmt.Errorf("cannot parse at %d", env.idx)
-	return
+	return nil, env, fmt.Errorf("cannot parse at %d", env.idx)
 }
 
 func parseEOF(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
@@ -140,7 +137,19 @@ func parseEOF(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, e
 func parseLParen(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
 	env.idx++
 	env.parenCount++
-	return parse(tokens, env)
+	ret, nextEnv, err := parse(tokens, env)
+	if err != nil {
+		return nil, nextEnv, err
+	}
+	if tokens[nextEnv.idx].TokenType != RParen {
+		return nil, env, fmt.Errorf("mismatch lparen at %d", env.idx)
+	}
+	nextEnv.parenCount--
+	if nextEnv.parenCount < 0 {
+		return nil, nextEnv, fmt.Errorf("mismatch rparen at %d", nextEnv.idx)
+	}
+	nextEnv.idx++
+	return ret, nextEnv, nil
 }
 
 func parseNumber(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
@@ -250,14 +259,7 @@ func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, 
 applyLoop:
 	for i := env.idx; ; {
 		switch t := tokens[i]; t.TokenType {
-		case RParen:
-			env.parenCount--
-			if env.parenCount < 0 {
-				return nil, env, fmt.Errorf("mismtach rparen at %d", i)
-			}
-			env.idx = i
-			break applyLoop
-		case EOF:
+		case RParen, EOF:
 			env.idx = i
 			break applyLoop
 		case Word:
