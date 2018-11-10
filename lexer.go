@@ -51,6 +51,7 @@ func NewLexer(source string) *Lexer {
 	return &Lexer{source, 0}
 }
 
+// HasNext returns whether this lexer has more tokens or not
 func (l *Lexer) HasNext() bool {
 	return l.cur < len(l.source)
 }
