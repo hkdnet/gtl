@@ -33,9 +33,19 @@ const (
 	Dot
 	// Number is "0"
 	Number
-	// Keyword is one of "true"
-	Keyword
+	// KeywordTrue is "true"
+	KeywordTrue
+	// KeywordFalse is "false"
+	KeywordFalse
+	// KeywordIf is "if"
+	KeywordIf
+	// KeywordThen is "then"
+	KeywordThen
+	// KeywordElse is "else"
+	KeywordElse
 )
+
+var keywordMap map[string]TokenType
 
 // Token is a token of typed_lang
 type Token struct {
@@ -47,6 +57,15 @@ var (
 	// ErrUnknownToken is an error for lexer, which means the source is not a valid typed_lang
 	ErrUnknownToken = errors.New("Unknown token")
 )
+
+func init() {
+	keywordMap = make(map[string]TokenType)
+	keywordMap["true"] = KeywordTrue
+	keywordMap["false"] = KeywordFalse
+	keywordMap["if"] = KeywordIf
+	keywordMap["then"] = KeywordThen
+	keywordMap["else"] = KeywordElse
+}
 
 // NewLexer returns a new lexer from source string
 func NewLexer(source string) *Lexer {
@@ -76,12 +95,10 @@ func (l *Lexer) NextToken() (*Token, error) {
 		l.cur++
 		return l.NextToken()
 	case strings.Contains("abcdefghijklmnopqrstuvwxyz", c):
-		// keywords
-		keywords := []string{"true", "false", "if", "then", "else"}
-		for _, kw := range keywords {
+		for kw, tt := range keywordMap {
 			if size := len(kw); len(l.source) >= idx+size && l.source[idx:idx+size] == kw {
 				l.cur += size
-				return &Token{Keyword, l.source[idx : idx+size]}, nil
+				return &Token{tt, kw}, nil
 			}
 		}
 		mode = Word

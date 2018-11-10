@@ -111,17 +111,14 @@ func parse(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, erro
 		return parseLParen(tokens, env)
 	case Number:
 		return parseNumber(tokens, env)
-	case Keyword:
-		switch t.Text {
-		case "true":
-			return parseTrue(tokens, env)
-		case "false":
-			return parseFalse(tokens, env)
-		case "then", "else":
-			return nil, env, fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
-		case "if":
-			return parseIf(tokens, env)
-		}
+	case KeywordTrue:
+		return parseTrue(tokens, env)
+	case KeywordFalse:
+		return parseFalse(tokens, env)
+	case KeywordThen, KeywordElse:
+		return nil, env, fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
+	case KeywordIf:
+		return parseIf(tokens, env)
 	case Dot: // start param
 		return parseDot(tokens, env)
 	case Word:
@@ -183,7 +180,7 @@ func parseIf(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, er
 		return nil, env, err
 	}
 	ret.Children[0] = cond
-	if thenToken := tokens[env.idx]; thenToken.TokenType != Keyword || thenToken.Text != "then" {
+	if thenToken := tokens[env.idx]; thenToken.TokenType != KeywordThen {
 		err := fmt.Errorf("token at %d should be then but %v", env.idx, thenToken)
 		return nil, env, err
 	}
@@ -193,7 +190,7 @@ func parseIf(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, er
 		return nil, env, err
 	}
 	ret.Children[1] = truePart
-	if elseToken := tokens[env.idx]; elseToken.TokenType != Keyword || elseToken.Text != "else" {
+	if elseToken := tokens[env.idx]; elseToken.TokenType != KeywordElse {
 		err := fmt.Errorf("token at %d should be else but %v", env.idx, elseToken)
 		return nil, env, err
 	}
