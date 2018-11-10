@@ -25,7 +25,7 @@ func TestParse(t *testing.T) {
 
 	// case: values
 	tokens = []*Token{
-		{Word, "true"},
+		{Keyword, "true"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
@@ -40,7 +40,7 @@ func TestParse(t *testing.T) {
 	}
 
 	tokens = []*Token{
-		{Word, "false"},
+		{Keyword, "false"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)
@@ -71,12 +71,12 @@ func TestParse(t *testing.T) {
 
 	// case if
 	tokens = []*Token{
-		{Word, "if"},
-		{Word, "true"},
-		{Word, "then"},
-		{Word, "true"},
-		{Word, "else"},
-		{Word, "false"},
+		{Keyword, "if"},
+		{Keyword, "true"},
+		{Keyword, "then"},
+		{Keyword, "true"},
+		{Keyword, "else"},
+		{Keyword, "false"},
 		{EOF, ""},
 	}
 	ast, err = Parse(tokens)

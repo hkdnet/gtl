@@ -105,70 +105,24 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 	env = _env
 	switch t := tokens[env.idx]; t.TokenType {
 	case EOF:
-		env.idx++
-		return
+		return parseEOF(tokens, env)
 	case LParen:
-		env.idx++
-		env.parenCount++
-		return parse(tokens, env)
+		return parseLParen(tokens, env)
 	case Number:
-		if t.Text == "0" {
-			env.idx++
-			ret = &Node{NodeType: Zero}
-			return
-		}
-		err = fmt.Errorf("unknown number %v", t.Text)
-		return
-	case Word:
-		if t.Text == "true" {
-			env.idx++
-			ret = &Node{NodeType: True}
-			return
-		}
-		if t.Text == "false" {
-			env.idx++
-			ret = &Node{NodeType: False}
-			return
-		}
-		if t.Text == "then" || t.Text == "else" {
+		return parseNumber(tokens, env)
+	case Keyword:
+		switch t.Text {
+		case "true":
+			return parseTrue(tokens, env)
+		case "false":
+			return parseFalse(tokens, env)
+		case "then", "else":
 			err = fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
-			return
+			return nil, env, nil
+		case "if":
+			return parseIf(tokens, env)
 		}
-		if t.Text == "if" {
-			ret = &Node{NodeType: IF, Children: make([]*Node, 3)}
-			env.idx++
-			var cond *Node
-			var truePart *Node
-			var falsePart *Node
-			cond, env, err = parse(tokens, env)
-			if err != nil {
-				return
-			}
-			ret.Children[0] = cond
-			if thenToken := tokens[env.idx]; thenToken.TokenType != Word || thenToken.Text != "then" {
-				err = fmt.Errorf("token at %d should be then but %v", env.idx, thenToken)
-				return
-			}
-			env.idx++
-			truePart, env, err = parse(tokens, env)
-			if err != nil {
-				return
-			}
-			ret.Children[1] = truePart
-			if elseToken := tokens[env.idx]; elseToken.TokenType != Word || elseToken.Text != "else" {
-				err = fmt.Errorf("token at %d should be else but %v", env.idx, elseToken)
-				return
-			}
-			env.idx++
-			falsePart, env, err = parse(tokens, env)
-			if err != nil {
-				return
-			}
-			ret.Children[2] = falsePart
-			env.idx++
-			return
-		}
-
+	case Word:
 		if env.idx+1 >= len(tokens) {
 			err = fmt.Errorf("the last token should be eof but got word %v", t.Text)
 			return
@@ -230,4 +184,67 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 
 	err = fmt.Errorf("cannot parse at %d", env.idx)
 	return
+}
+
+func parseEOF(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++
+	return nil, env, nil
+}
+
+func parseLParen(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++
+	env.parenCount++
+	return parse(tokens, env)
+}
+
+func parseNumber(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	t := tokens[env.idx]
+	if t.Text == "0" {
+		env.idx++
+		ret := &Node{NodeType: Zero}
+		return ret, env, nil
+	}
+	err := fmt.Errorf("unknown number %v", t.Text)
+	return nil, env, err
+}
+
+func parseTrue(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++
+	return &Node{NodeType: True}, env, nil
+}
+
+func parseFalse(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++
+	return &Node{NodeType: False}, env, nil
+}
+
+func parseIf(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++ // if
+	ret := &Node{NodeType: IF, Children: make([]*Node, 3)}
+	cond, env, err := parse(tokens, env)
+	if err != nil {
+		return nil, env, err
+	}
+	ret.Children[0] = cond
+	if thenToken := tokens[env.idx]; thenToken.TokenType != Keyword || thenToken.Text != "then" {
+		err := fmt.Errorf("token at %d should be then but %v", env.idx, thenToken)
+		return nil, env, err
+	}
+	env.idx++ // then
+	truePart, env, err := parse(tokens, env)
+	if err != nil {
+		return nil, env, err
+	}
+	ret.Children[1] = truePart
+	if elseToken := tokens[env.idx]; elseToken.TokenType != Keyword || elseToken.Text != "else" {
+		err := fmt.Errorf("token at %d should be else but %v", env.idx, elseToken)
+		return nil, env, err
+	}
+	env.idx++ // else
+	falsePart, env, err := parse(tokens, env)
+	if err != nil {
+		return nil, env, err
+	}
+	ret.Children[2] = falsePart
+	return ret, env, err
 }
