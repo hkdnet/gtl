@@ -4,9 +4,9 @@ package gtl
 
 import "strconv"
 
-const _NodeType_name = "ProgramTrueFalseIFZeroSuccPredIsZeroVariableLambdaLambdaDefLambdaParamLambdaBody"
+const _NodeType_name = "ProgramTrueFalseIFZeroSuccPredIsZeroVariableLambdaLambdaDefLambdaParamLambdaBodyApply"
 
-var _NodeType_index = [...]uint8{0, 7, 11, 16, 18, 22, 26, 30, 36, 44, 50, 59, 70, 80}
+var _NodeType_index = [...]uint8{0, 7, 11, 16, 18, 22, 26, 30, 36, 44, 50, 59, 70, 80, 85}
 
 func (i NodeType) String() string {
 	if i >= NodeType(len(_NodeType_index)-1) {
