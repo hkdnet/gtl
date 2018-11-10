@@ -169,3 +169,24 @@ func Test_parseDot(t *testing.T) {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 }
+
+func Test_parseWord(t *testing.T) {
+	var env parseEnvironemnt
+	tokens := []*Token{
+		{Word, "a"},
+		{Word, "b"},
+		{Word, "c"},
+		{Word, "d"},
+		{EOF, ""},
+	}
+	node, env, err := parseWord(tokens, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want, got := 4, env.idx; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Apply, node.NodeType; got != got {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+}

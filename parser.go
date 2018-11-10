@@ -125,32 +125,7 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 	case Dot: // start param
 		return parseDot(tokens, env)
 	case Word:
-		if env.idx+1 >= len(tokens) {
-			err = fmt.Errorf("the last token should be eof but got word %v", t.Text)
-			return
-		}
-
-		// variable name
-		switch nextToken := tokens[env.idx+1]; nextToken.TokenType {
-		case RParen:
-			if env.parenCount < 1 {
-				err = fmt.Errorf("paren mismatch at %d", env.idx+1)
-				return
-			}
-			env.parenCount--
-			env.idx += 2
-			ret = &Node{NodeType: Variable}
-			return
-		case EOF:
-			env.idx++
-			ret = &Node{NodeType: Variable}
-			return
-		case Word: // TODO: is this only apply?
-			env.idx += 2
-			children := []*Node{}
-			ret = &Node{NodeType: Apply, Children: children}
-			return
-		}
+		return parseWord(tokens, env)
 	}
 
 	err = fmt.Errorf("cannot parse at %d", env.idx)
@@ -258,5 +233,44 @@ paramLoop:
 	}
 	body.Children = []*Node{bc}
 
+	return ret, env, nil
+}
+
+// x y z -> (x y) z
+// a b c d -> ((a b) c) d
+func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	if nt := tokens[env.idx+1]; nt.TokenType == EOF || nt.TokenType == RParen {
+		env.idx++
+		return &Node{NodeType: Variable}, env, nil
+	}
+	ret := &Node{NodeType: Apply}
+	ret.Children = make([]*Node, 2)
+	ret.Children[0] = &Node{NodeType: Variable}
+	env.idx++
+applyLoop:
+	for i := env.idx; ; {
+		switch t := tokens[i]; t.TokenType {
+		case RParen:
+			env.parenCount--
+			if env.parenCount < 0 {
+				return nil, env, fmt.Errorf("mismtach rparen at %d", i)
+			}
+			env.idx = i
+			break applyLoop
+		case EOF:
+			env.idx = i
+			break applyLoop
+		case Word:
+			l := ret.Children[0]
+			r := &Node{NodeType: Variable}
+			ret.Children[0] = &Node{
+				NodeType: Apply,
+				Children: []*Node{l, r},
+			}
+			i++
+		default:
+			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
+		}
+	}
 	return ret, env, nil
 }
