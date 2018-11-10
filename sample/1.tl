@@ -1,1 +1,1 @@
-x. -> x false
+(x. -> x) false

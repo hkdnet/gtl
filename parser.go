@@ -71,7 +71,8 @@ func (n *Node) IsValue() bool {
 }
 
 type parseEnvironemnt struct {
-	idx int
+	idx        int
+	parenCount int
 }
 
 // Parse returns an AST for tokens.
@@ -81,12 +82,22 @@ func Parse(tokens []*Token) (*AST, error) {
 	ret := &AST{Child: tmp}
 
 	var env parseEnvironemnt
-	t, _, err := parse(tokens, env)
-	if err != nil {
-		return nil, err
+	for l := len(tokens); env.idx < l; {
+		var t *Node
+		var err error
+		t, env, err = parse(tokens, env)
+		if err != nil {
+			return nil, err
+		}
+		// FIXME: too tricky...
+		if t == nil {
+			if env.idx != l {
+				return ret, fmt.Errorf("parse returns nil pointer at %d", env.idx)
+			}
+			return ret, nil
+		}
+		tmp.Children = append(tmp.Children, t)
 	}
-	// TODO: if nextIdx != len(tokens check ?
-	tmp.Children = []*Node{t}
 	return ret, nil
 }
 
@@ -96,6 +107,10 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 	case EOF:
 		env.idx++
 		return
+	case LParen:
+		env.idx++
+		env.parenCount++
+		return parse(tokens, env)
 	case Number:
 		if t.Text == "0" {
 			env.idx++
@@ -161,6 +176,15 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 
 		// variable name
 		switch nextToken := tokens[env.idx+1]; nextToken.TokenType {
+		case RParen:
+			if env.parenCount < 1 {
+				err = fmt.Errorf("paren mismatch at %d", env.idx+1)
+				return
+			}
+			env.parenCount--
+			env.idx += 2
+			ret = &Node{NodeType: Variable}
+			return
 		case EOF:
 			env.idx++
 			ret = &Node{NodeType: Variable}
@@ -202,7 +226,6 @@ func parse(tokens []*Token, _env parseEnvironemnt) (ret *Node, env parseEnvirone
 			ret = &Node{NodeType: Apply, Children: children}
 			return
 		}
-
 	}
 
 	err = fmt.Errorf("cannot parse at %d", env.idx)
