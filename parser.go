@@ -46,6 +46,8 @@ const (
 	LambdaParam
 	// LambdaBody has single child
 	LambdaBody
+	// Apply is "function call"
+	Apply
 )
 
 // IsNumericalValue returns whether a node is a numerical value or not.
@@ -171,6 +173,11 @@ func parse(tokens []*Token, i int) (*Node, int, error) {
 			body.Children = []*Node{bc}
 
 			return ret, nextIdx, nil
+		case Word: // TODO: is this only apply?
+			i += 2
+			children := []*Node{}
+			ret := &Node{NodeType: Apply, Children: children}
+			return ret, i, nil
 		}
 
 	}
