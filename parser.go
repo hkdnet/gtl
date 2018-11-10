@@ -263,6 +263,14 @@ applyLoop:
 			v := &Node{NodeType: Variable, Name: tokens[i].Text}
 			words = append(words, v)
 			i++
+		case KeywordTrue:
+			v := &Node{NodeType: True}
+			words = append(words, v)
+			i++
+		case KeywordFalse:
+			v := &Node{NodeType: False}
+			words = append(words, v)
+			i++
 		default:
 			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
 		}
