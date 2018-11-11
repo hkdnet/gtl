@@ -49,7 +49,7 @@ func Eval(ast *AST) error {
 
 func eval(n *Node, env evalEnvironment) (*Node, error) {
 	switch n.NodeType {
-	case True, False, Zero:
+	case True, False, Zero, FreeVariable:
 		return n, nil
 	case IF:
 		cond, err := eval(n.Children[0], env)
@@ -63,7 +63,7 @@ func eval(n *Node, env evalEnvironment) (*Node, error) {
 			return eval(n.Children[2], env)
 		}
 		return nil, errors.New("cond should be bool but not")
-	case Variable: // TODO: free variable?
+	case Variable:
 		val, err := env.Lookup(n.Name)
 		if err != nil {
 			return nil, err
