@@ -9,12 +9,24 @@ type AST struct {
 	Child *Node
 }
 
+func (ast *AST) show() {
+	ast.Child.show("")
+}
+
 // Node has nodeType and children
 type Node struct {
 	NodeType NodeType
 	Children []*Node
 
 	Name string // for Variable, LambdaParam
+}
+
+func (n *Node) show(indent string) {
+	fmt.Printf("%s%s\n", indent, n.NodeType)
+	nextIndent := indent + "  "
+	for _, c := range n.Children {
+		c.show(nextIndent)
+	}
 }
 
 // IsNumericalValue returns whether a node is a numerical value or not.
