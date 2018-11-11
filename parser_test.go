@@ -178,9 +178,37 @@ func Test_parseIf(t *testing.T) {
 		{Word, "c"},
 		{EOF, ""},
 	}
-	_, _, err := parseIf(tokens, env)
+	node, _, err := parseIf(tokens, env)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if want, got := IF, node.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := 3, len(node.Children); got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+		return
+	}
+	cond := node.Children[0]
+	truePart := node.Children[1]
+	falsePart := node.Children[2]
+	if want, got := Variable, cond.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "a", cond.Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Variable, truePart.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "b", truePart.Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Variable, falsePart.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := "c", falsePart.Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
 	}
 }
 
