@@ -9,6 +9,8 @@ import (
 type Lexer struct {
 	source string
 	cur    int
+
+	hasNext bool
 }
 
 var keywordMap map[string]TokenType
@@ -35,18 +37,19 @@ func init() {
 
 // NewLexer returns a new lexer from source string
 func NewLexer(source string) *Lexer {
-	return &Lexer{source, 0}
+	return &Lexer{source, 0, true}
 }
 
 // HasNext returns whether this lexer has more tokens or not
 func (l *Lexer) HasNext() bool {
-	return l.cur < len(l.source)
+	return l.hasNext
 }
 
 // NextToken returns a next token, and increments its cursor
 func (l *Lexer) NextToken() (*Token, error) {
 	beg := l.cur
 	if beg == len(l.source) {
+		l.hasNext = false
 		return &Token{EOF, ""}, nil
 	}
 	if beg > len(l.source) {
