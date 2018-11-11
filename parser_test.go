@@ -167,6 +167,23 @@ func TestParse(t *testing.T) {
 	assertValidAST(ast)
 }
 
+func Test_parseIf(t *testing.T) {
+	var env parseEnvironemnt
+	tokens := []*Token{
+		{KeywordIf, "if"},
+		{KeywordTrue, "a"},
+		{KeywordThen, "then"},
+		{Word, "b"},
+		{KeywordElse, "else"},
+		{Word, "c"},
+		{EOF, ""},
+	}
+	_, _, err := parseIf(tokens, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func Test_parseDot(t *testing.T) {
 	var env parseEnvironemnt
 	tokens := []*Token{

@@ -277,6 +277,9 @@ applyLoop:
 			v := &Node{NodeType: False}
 			words = append(words, v)
 			i++
+		case KeywordThen, KeywordElse:
+			env.idx = i
+			break applyLoop
 		default:
 			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
 		}
