@@ -183,7 +183,25 @@ func Test_parseDot(t *testing.T) {
 	if want, got := 4, env.idx; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Lambda, node.NodeType; got != got {
+	if want, got := Lambda, node.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	if want, got := Variable, node.Children[1].Children[0].NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	env = parseEnvironemnt{}
+	tokens = []*Token{
+		{Dot, "."},
+		{Word, "a"},
+		{Arrow, "->"},
+		{Word, "b"},
+		{EOF, ""},
+	}
+	node, env, err = parseDot(tokens, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want, got := FreeVariable, node.Children[1].Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 }
