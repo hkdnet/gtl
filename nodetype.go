@@ -23,6 +23,8 @@ const (
 	// Variable is a variable
 	// TODO: better comment ...
 	Variable
+	// FreeVariable is a free variable
+	FreeVariable
 	// Lambda is a function. a lambda's children are always [LambdaDef, LambdaBody]
 	Lambda
 	// LambdaDef has some LambdaParams
