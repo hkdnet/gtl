@@ -40,6 +40,31 @@ func (n *Node) IsValue() bool {
 type parseEnvironemnt struct {
 	idx        int
 	parenCount int
+
+	knownWords []string
+}
+
+func (e *parseEnvironemnt) AddKnownWord(name string) {
+	e.knownWords = append(e.knownWords, name)
+}
+
+func (e *parseEnvironemnt) RemoveKnownWord(name string) error {
+	for i := len(e.knownWords) - 1; i >= 0; i-- {
+		if e.knownWords[i] == name {
+			e.knownWords = append(e.knownWords[:i], e.knownWords[i+1:]...)
+			return nil
+		}
+	}
+	return fmt.Errorf("unknown word %s", name)
+}
+
+func (e *parseEnvironemnt) IsBound(name string) bool {
+	for i := len(e.knownWords) - 1; i >= 0; i-- {
+		if e.knownWords[i] == name {
+			return true
+		}
+	}
+	return false
 }
 
 // Parse returns an AST for tokens.
@@ -199,24 +224,40 @@ paramLoop:
 		}
 	}
 
+	for _, p := range def.Children {
+		env.AddKnownWord(p.Name)
+	}
 	bc, env, err := parse(tokens, env)
 	if err != nil {
 		return nil, env, err
+	}
+	for _, p := range def.Children {
+		env.RemoveKnownWord(p.Name)
 	}
 	body.Children = []*Node{bc}
 
 	return ret, env, nil
 }
 
+func buildVariableNode(env parseEnvironemnt, name string) *Node {
+	var nt NodeType
+	if env.IsBound(name) {
+		nt = Variable
+	} else {
+		nt = FreeVariable
+	}
+	return &Node{NodeType: nt, Name: name}
+}
+
 // x y z -> (x y) z
 // a b c d -> ((a b) c) d
 func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
 	if nt := tokens[env.idx+1]; nt.TokenType == EOF || nt.TokenType == RParen {
-		ret := &Node{NodeType: Variable, Name: tokens[env.idx].Text}
+		ret := buildVariableNode(env, tokens[env.idx].Text)
 		env.idx++
 		return ret, env, nil
 	}
-	words := []*Node{&Node{NodeType: Variable, Name: tokens[env.idx].Text}}
+	words := []*Node{buildVariableNode(env, tokens[env.idx].Text)}
 	env.idx++
 applyLoop:
 	for i := env.idx; ; {
@@ -225,7 +266,7 @@ applyLoop:
 			env.idx = i
 			break applyLoop
 		case Word:
-			v := &Node{NodeType: Variable, Name: tokens[i].Text}
+			v := buildVariableNode(env, tokens[i].Text)
 			words = append(words, v)
 			i++
 		case KeywordTrue:

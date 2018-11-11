@@ -229,3 +229,16 @@ func Test_parseWord(t *testing.T) {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 }
+
+func Test_buildVariableNode(t *testing.T) {
+	var env parseEnvironemnt
+	env.AddKnownWord("a")
+	n := buildVariableNode(env, "a")
+	if want, got := Variable, n.NodeType; want != got {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	n = buildVariableNode(env, "b")
+	if want, got := FreeVariable, n.NodeType; want != got {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+}
