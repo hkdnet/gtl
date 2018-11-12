@@ -33,7 +33,7 @@ func (n *Node) String() string {
 		return n.Name
 	case Lambda:
 		return fmt.Sprintf("%s -> (%s)", n.Children[0], n.Children[1])
-	case LambdaParam:
+	case LambdaDef:
 		var tmp []string
 		for _, p := range n.Children {
 			tmp = append(tmp, fmt.Sprintf("%s.", p.Name))
@@ -43,8 +43,9 @@ func (n *Node) String() string {
 		return n.Children[0].String()
 	case Apply:
 		return fmt.Sprintf("%s %s", n.Children[0], n.Children[1])
+	default:
+		panic("unknown type?")
 	}
-	return ""
 }
 
 func (n *Node) show(indent string) {
