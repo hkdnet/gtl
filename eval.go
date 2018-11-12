@@ -48,7 +48,7 @@ func Eval(ast *AST) (*Node, error) {
 
 func eval(n *Node, env *evalEnvironment) (*Node, error) {
 	switch n.NodeType {
-	case True, False, Zero, FreeVariable, Lambda:
+	case True, False, Zero, FreeVariable, Lambda, NodeNumber:
 		return n, nil
 	case IF:
 		return evalIf(n, env)

@@ -279,6 +279,10 @@ applyLoop:
 			v := &Node{NodeType: False}
 			nodes = append(nodes, v)
 			i++
+		case Number:
+			v := &Node{NodeType: NodeNumber}
+			nodes = append(nodes, v)
+			i++
 		case KeywordThen, KeywordElse:
 			env.idx = i
 			break applyLoop
