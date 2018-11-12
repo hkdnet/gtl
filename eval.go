@@ -95,7 +95,7 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 	body := l.Children[1]
 	assigned := def.Children[0]
 	env.Assign(assigned.Name, r)
-	body, err = eval(body, env)
+	body, err = eval(body.Children[0], env)
 	if err != nil {
 		return nil, err
 	}
