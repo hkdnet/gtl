@@ -36,15 +36,14 @@ func (ee *evalEnvironment) Unassign(name string) error {
 	return fmt.Errorf("missing unassignment target %s", name)
 }
 
-// Eval shows evaluated value
-func Eval(ast *AST) error {
+// Eval returns evaluated node
+func Eval(ast *AST) (*Node, error) {
 	var env evalEnvironment
 	n, err := eval(ast.Child, &env)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	fmt.Printf("%v\n", n)
-	return nil
+	return n, nil
 }
 
 func eval(n *Node, env *evalEnvironment) (*Node, error) {
