@@ -2,17 +2,22 @@ package gtl
 
 import "testing"
 
-func evalFromString(str string) (*AST, error) {
+// NOTE: this function may cause panic
+func buildASTFromString(str string) *AST {
 	l := NewLexer(str)
 	var tokens []*Token
 	for l.HasNext() {
 		t, err := l.NextToken()
 		if err != nil {
-			return nil, err
+			panic(err)
 		}
 		tokens = append(tokens, t)
 	}
-	return Parse(tokens)
+	ast, err := Parse(tokens)
+	if err != nil {
+		panic(err) // for convenience
+	}
+	return ast
 }
 
 func Test_evalEnvironment(t *testing.T) {
@@ -47,15 +52,8 @@ func Test_evalEnvironment(t *testing.T) {
 }
 
 func Test_evalIf(t *testing.T) {
-	ast, err := evalFromString("if true then a else b")
-	if err != nil {
-		t.Fatal(err)
-	}
-	ast.show()
+	ast := buildASTFromString("if true then a else b")
 	ifNode := ast.Child
-	if want, got := IF, ifNode.NodeType; got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
 	var env evalEnvironment
 	n, err := evalIf(ifNode, &env)
 	if err != nil {
