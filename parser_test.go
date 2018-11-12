@@ -171,7 +171,7 @@ func Test_parseIf(t *testing.T) {
 	var env parseEnvironemnt
 	tokens := []*Token{
 		{KeywordIf, "if"},
-		{KeywordTrue, "a"},
+		{Word, "a"},
 		{KeywordThen, "then"},
 		{Word, "b"},
 		{KeywordElse, "else"},
@@ -192,19 +192,19 @@ func Test_parseIf(t *testing.T) {
 	cond := node.Children[0]
 	truePart := node.Children[1]
 	falsePart := node.Children[2]
-	if want, got := Variable, cond.NodeType; got != want {
+	if want, got := FreeVariable, cond.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 	if want, got := "a", cond.Name; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Variable, truePart.NodeType; got != want {
+	if want, got := FreeVariable, truePart.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 	if want, got := "b", truePart.Name; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := Variable, falsePart.NodeType; got != want {
+	if want, got := FreeVariable, falsePart.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 	if want, got := "c", falsePart.Name; got != want {
