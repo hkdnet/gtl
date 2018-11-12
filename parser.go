@@ -261,6 +261,25 @@ func buildVariableNode(env parseEnvironemnt, name string) *Node {
 	return &Node{NodeType: nt, Name: name}
 }
 
+// len(nodes) must be more than 1
+func nodesToApply(nodes []*Node) *Node {
+	var app *Node
+	for i, l := 1, len(nodes); i < l; i++ {
+		if app == nil { // 1st
+			app = &Node{
+				NodeType: Apply,
+				Children: []*Node{nodes[0], nodes[i]},
+			}
+		} else {
+			app = &Node{
+				NodeType: Apply,
+				Children: []*Node{app, nodes[i]},
+			}
+		}
+	}
+	return app
+}
+
 // x y z -> (x y) z
 // a b c d -> ((a b) c) d
 func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
@@ -296,19 +315,6 @@ applyLoop:
 			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
 		}
 	}
-	var app *Node
-	for i, l := 1, len(words); i < l; i++ {
-		if app == nil { // 1st
-			app = &Node{
-				NodeType: Apply,
-				Children: []*Node{words[0], words[i]},
-			}
-		} else {
-			app = &Node{
-				NodeType: Apply,
-				Children: []*Node{app, words[i]},
-			}
-		}
-	}
+	app := nodesToApply(words)
 	return app, env, nil
 }
