@@ -1,6 +1,8 @@
 package gtl
 
-import "testing"
+import (
+	"testing"
+)
 
 // NOTE: this function may cause panic
 func buildASTFromString(str string) *AST {

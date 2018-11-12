@@ -96,7 +96,7 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if l.NodeType != Lambda { // cannot eval apply
+	if !l.IsApplyable() { // cannot eval apply
 		return &Node{NodeType: Apply, Children: []*Node{l, r}}, nil
 	}
 	// l.NodeType == Lambda

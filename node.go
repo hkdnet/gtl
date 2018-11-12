@@ -75,3 +75,14 @@ func (n *Node) IsValue() bool {
 	}
 	return n.IsNumericalValue()
 }
+
+// IsApplyable returns this node is suitable for Apply.Children[0]
+func (n *Node) IsApplyable() bool {
+	if n.NodeType == Lambda {
+		return true
+	}
+	if n.NodeType == Succ || n.NodeType == Pred || n.NodeType == IsZero {
+		return true
+	}
+	return false
+}
