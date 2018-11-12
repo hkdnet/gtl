@@ -2,6 +2,19 @@ package gtl
 
 import "testing"
 
+func evalFromString(str string) (*AST, error) {
+	l := NewLexer(str)
+	var tokens []*Token
+	for l.HasNext() {
+		t, err := l.NextToken()
+		if err != nil {
+			return nil, err
+		}
+		tokens = append(tokens, t)
+	}
+	return Parse(tokens)
+}
+
 func Test_evalEnvironment(t *testing.T) {
 	var ee evalEnvironment
 
@@ -27,19 +40,6 @@ func Test_evalEnvironment(t *testing.T) {
 	if v != nil {
 		t.Error("Lookup for unassigned name should return nil")
 	}
-}
-
-func evalFromString(str string) (*AST, error) {
-	l := NewLexer(str)
-	var tokens []*Token
-	for l.HasNext() {
-		t, err := l.NextToken()
-		if err != nil {
-			return nil, err
-		}
-		tokens = append(tokens, t)
-	}
-	return Parse(tokens)
 }
 
 func Test_evalIf(t *testing.T) {
