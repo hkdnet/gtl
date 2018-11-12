@@ -264,7 +264,7 @@ func buildVariableNode(env parseEnvironemnt, name string) *Node {
 // x y z -> (x y) z
 // a b c d -> ((a b) c) d
 func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
-	if nt := tokens[env.idx+1]; nt.TokenType == EOF || nt.TokenType == RParen {
+	if nt := tokens[env.idx+1]; nt.TokenType == EOF || nt.TokenType == RParen || nt.TokenType == KeywordThen || nt.TokenType == KeywordElse {
 		ret := buildVariableNode(env, tokens[env.idx].Text)
 		env.idx++
 		return ret, env, nil
