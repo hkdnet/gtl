@@ -83,3 +83,22 @@ func Test_evalIf(t *testing.T) {
 		}
 	})
 }
+
+func Test_evalApply(t *testing.T) {
+	assertEval("(.a -> a) true", func(n *Node) {
+		if want, got := True, n.NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
+	assertEval("a true", func(n *Node) {
+		if want, got := Apply, n.NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := FreeVariable, n.Children[0].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := True, n.Children[1].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
+}
