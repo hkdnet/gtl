@@ -57,7 +57,7 @@ func eval(n *Node, env *evalEnvironment) (*Node, error) {
 	case Variable:
 		return evalVariable(n, env)
 	default:
-		return nil, errors.New("error")
+		return nil, fmt.Errorf("cannot eval: %s", n.NodeType)
 	}
 }
 
