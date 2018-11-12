@@ -45,14 +45,6 @@ func run(filename string) error {
 	if err != nil {
 		return err
 	}
-	showNode(result, "")
+	fmt.Println(result)
 	return nil
-}
-
-func showNode(n *gtl.Node, indent string) {
-	fmt.Printf("%s%s\n", indent, n.NodeType)
-	nextIndent := indent + "  "
-	for _, c := range n.Children {
-		showNode(c, nextIndent)
-	}
 }
