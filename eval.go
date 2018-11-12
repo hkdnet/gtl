@@ -1,7 +1,6 @@
 package gtl
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -73,7 +72,16 @@ func evalIf(n *Node, env *evalEnvironment) (*Node, error) {
 	if cond.NodeType == False {
 		return eval(n.Children[2], env)
 	}
-	return nil, errors.New("cond should be bool but not")
+	// TODO: type check
+	truePart, err := eval(n.Children[1], env)
+	if err != nil {
+		return nil, err
+	}
+	falsePart, err := eval(n.Children[2], env)
+	if err != nil {
+		return nil, err
+	}
+	return &Node{NodeType: IF, Children: []*Node{cond, truePart, falsePart}}, nil
 }
 
 func evalApply(n *Node, env *evalEnvironment) (*Node, error) {

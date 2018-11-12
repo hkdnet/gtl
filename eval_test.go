@@ -74,4 +74,12 @@ func Test_evalIf(t *testing.T) {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	})
+	assertEval("if a then b else c", func(n *Node) {
+		if want, got := IF, n.NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := "if (a) then (b) else (c)", n.String(); got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
 }
