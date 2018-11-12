@@ -32,4 +32,6 @@ const (
 	LambdaBody
 	// Apply is "function call"
 	Apply
+	// NodeNumber is a numerical value
+	NodeNumber
 )
