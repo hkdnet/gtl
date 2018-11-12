@@ -25,7 +25,7 @@ func assertEval(source string, assert func(*Node)) {
 	ast := buildASTFromString(source)
 	node := ast.Child
 	var env evalEnvironment
-	n, err := evalIf(node, &env)
+	n, err := eval(node, &env)
 	if err != nil {
 		panic(err)
 	}
