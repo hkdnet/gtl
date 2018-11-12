@@ -14,42 +14,6 @@ func (ast *AST) show() {
 	ast.Child.show("")
 }
 
-// Node has nodeType and children
-type Node struct {
-	NodeType NodeType
-	Children []*Node
-
-	Name string // for Variable, LambdaParam
-}
-
-func (n *Node) show(indent string) {
-	fmt.Printf("%s%s\n", indent, n.NodeType)
-	nextIndent := indent + "  "
-	for _, c := range n.Children {
-		c.show(nextIndent)
-	}
-}
-
-// IsNumericalValue returns whether a node is a numerical value or not.
-func (n *Node) IsNumericalValue() bool {
-	if n.NodeType == Zero {
-		return true
-	}
-	if n.NodeType == Succ {
-		c := n.Children[0]
-		return c.IsNumericalValue()
-	}
-	return false
-}
-
-// IsValue returns whether a node is a value or not.
-func (n *Node) IsValue() bool {
-	if n.NodeType == True || n.NodeType == False {
-		return true
-	}
-	return n.IsNumericalValue()
-}
-
 type parseEnvironemnt struct {
 	idx        int
 	parenCount int
