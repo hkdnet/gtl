@@ -10,28 +10,22 @@ func Test_evalEnvironment(t *testing.T) {
 	node3 := &Node{}
 	ee.Assign("a", node1)
 	ee.Assign("aa", node2)
-	v, err := ee.Lookup("a")
-	if err != nil {
-		t.Fatal(err)
-	}
+	v := ee.Lookup("a")
 	if v != node1 {
 		t.Errorf("Lookup should return exact match")
 	}
 	ee.Assign("a", node3) // overwrite
-	v, err = ee.Lookup("a")
-	if err != nil {
-		t.Fatal(err)
-	}
+	v = ee.Lookup("a")
 	if v != node3 {
 		t.Errorf("should return latest assignment")
 	}
-	err = ee.Unassign("aa")
+	err := ee.Unassign("aa")
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = ee.Lookup("aa")
-	if err == nil {
-		t.Error("Lookup for unassigned name should return error")
+	v = ee.Lookup("aa")
+	if v != nil {
+		t.Error("Lookup for unassigned name should return nil")
 	}
 }
 

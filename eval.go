@@ -18,14 +18,15 @@ func (ee *evalEnvironment) Assign(name string, val *Node) {
 	ee.assginments = append(ee.assginments, assginment{name, val})
 }
 
-func (ee *evalEnvironment) Lookup(name string) (*Node, error) {
+func (ee *evalEnvironment) Lookup(name string) *Node {
 	for i := len(ee.assginments) - 1; i >= 0; i-- {
 		if ee.assginments[i].name == name {
-			return ee.assginments[i].value, nil
+			return ee.assginments[i].value
 		}
 	}
-	return nil, fmt.Errorf("missing assignment for %s", name)
+	return nil
 }
+
 func (ee *evalEnvironment) Unassign(name string) error {
 	for i := len(ee.assginments) - 1; i >= 0; i-- {
 		if ee.assginments[i].name == name {
@@ -112,9 +113,11 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 }
 
 func evalVariable(n *Node, env *evalEnvironment) (*Node, error) {
-	val, err := env.Lookup(n.Name)
-	if err != nil {
-		return nil, err
+	val := env.Lookup(n.Name)
+	if val == nil {
+		// nil means this variable is literally bound but its value is not yet bound...
+		// (.x .y -> x y) iszero => iszero y
+		return n, nil
 	}
 	return val, nil
 }
