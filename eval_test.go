@@ -20,6 +20,18 @@ func buildASTFromString(str string) *AST {
 	return ast
 }
 
+// helper function
+func assertEval(source string, assert func(*Node)) {
+	ast := buildASTFromString(source)
+	node := ast.Child
+	var env evalEnvironment
+	n, err := evalIf(node, &env)
+	if err != nil {
+		panic(err)
+	}
+	assert(n)
+}
+
 func Test_evalEnvironment(t *testing.T) {
 	var ee evalEnvironment
 
@@ -52,14 +64,14 @@ func Test_evalEnvironment(t *testing.T) {
 }
 
 func Test_evalIf(t *testing.T) {
-	ast := buildASTFromString("if true then a else b")
-	ifNode := ast.Child
-	var env evalEnvironment
-	n, err := evalIf(ifNode, &env)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want, got := "a", n.Name; got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
+	assertEval("if true then a else b", func(n *Node) {
+		if want, got := "a", n.Name; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
+	assertEval("if false then a else b", func(n *Node) {
+		if want, got := "b", n.Name; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
 }
