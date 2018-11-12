@@ -4,10 +4,8 @@ package gtl
 type NodeType uint8
 
 const (
-	// Program is a toplevel node
-	Program NodeType = iota
 	// True is literal true
-	True
+	True NodeType = iota
 	// False is literal false
 	False
 	// IF is a if expression
