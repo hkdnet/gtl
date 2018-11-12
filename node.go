@@ -36,7 +36,7 @@ func (n *Node) String() string {
 	case LambdaDef:
 		var tmp []string
 		for _, p := range n.Children {
-			tmp = append(tmp, fmt.Sprintf("%s.", p.Name))
+			tmp = append(tmp, fmt.Sprintf(".%s", p.Name))
 		}
 		return strings.Join(tmp, " ")
 	case LambdaBody:
