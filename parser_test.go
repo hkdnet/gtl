@@ -9,7 +9,6 @@ func TestParse(t *testing.T) {
 	var tokens []*Token
 	var ast *AST
 	var err error
-	var program *Node
 
 	assertValidAST := func(ast *AST) {
 		if ast == nil {
@@ -17,9 +16,6 @@ func TestParse(t *testing.T) {
 		}
 		if ast.Child == nil {
 			t.Fatal("ast should have child")
-		}
-		if want, got := Program, ast.Child.NodeType; got != want {
-			t.Errorf("want %v but got %v\n", want, got)
 		}
 	}
 
@@ -34,11 +30,7 @@ func TestParse(t *testing.T) {
 	}
 
 	assertValidAST(ast)
-	program = ast.Child
-	if want, got := 1, len(program.Children); got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
-	if want, got := True, program.Children[0].NodeType; got != want {
+	if want, got := True, ast.Child.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -52,11 +44,7 @@ func TestParse(t *testing.T) {
 	}
 
 	assertValidAST(ast)
-	program = ast.Child
-	if want, got := 1, len(program.Children); got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
-	if want, got := False, program.Children[0].NodeType; got != want {
+	if want, got := False, ast.Child.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -70,11 +58,7 @@ func TestParse(t *testing.T) {
 	}
 
 	assertValidAST(ast)
-	program = ast.Child
-	if want, got := 1, len(program.Children); got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
-	if want, got := Zero, program.Children[0].NodeType; got != want {
+	if want, got := Zero, ast.Child.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -94,14 +78,10 @@ func TestParse(t *testing.T) {
 	}
 
 	assertValidAST(ast)
-	program = ast.Child
-	if want, got := 1, len(program.Children); got != want {
+	if want, got := IF, ast.Child.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	if want, got := IF, program.Children[0].NodeType; got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
-	if want, got := True, program.Children[0].Children[0].NodeType; got != want {
+	if want, got := True, ast.Child.Children[0].NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 
@@ -119,16 +99,12 @@ func TestParse(t *testing.T) {
 	}
 
 	assertValidAST(ast)
-	program = ast.Child
-	if want, got := 1, len(program.Children); got != want {
-		t.Errorf("want %v but got %v\n", want, got)
-	}
-	if want, got := Lambda, program.Children[0].NodeType; got != want {
+	if want, got := Lambda, ast.Child.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
 	{
-		def := program.Children[0].Children[0]
-		body := program.Children[0].Children[1]
+		def := ast.Child.Children[0]
+		body := ast.Child.Children[1]
 		if want, got := LambdaDef, def.NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}

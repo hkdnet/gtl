@@ -60,8 +60,7 @@ func Test_evalIf(t *testing.T) {
 		t.Fatal(err)
 	}
 	ast.show()
-	pg := ast.Child
-	ifNode := pg.Children[0]
+	ifNode := ast.Child
 	if want, got := IF, ifNode.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}

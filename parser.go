@@ -1,6 +1,7 @@
 package gtl
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -81,11 +82,9 @@ func (e *parseEnvironemnt) IsBound(name string) bool {
 
 // Parse returns an AST for tokens.
 func Parse(tokens []*Token) (*AST, error) {
-	var tmp *Node
-	tmp = &Node{NodeType: Program}
-	ret := &AST{Child: tmp}
-
+	var nodes []*Node
 	var env parseEnvironemnt
+parseLoop:
 	for l := len(tokens); env.idx < l; {
 		var t *Node
 		var err error
@@ -96,12 +95,20 @@ func Parse(tokens []*Token) (*AST, error) {
 		// FIXME: too tricky...
 		if t == nil {
 			if env.idx != l {
-				return ret, fmt.Errorf("parse returns nil pointer at %d", env.idx)
+				return nil, fmt.Errorf("parse returns nil pointer at %d", env.idx)
 			}
-			return ret, nil
+			break parseLoop
 		}
-		tmp.Children = append(tmp.Children, t)
+		nodes = append(nodes, t)
 	}
+	if l := len(nodes); l == 0 {
+		return nil, errors.New("no nodes")
+	} else if l == 1 {
+		ret := &AST{Child: nodes[0]}
+		return ret, nil
+	}
+	app := nodesToApply(nodes)
+	ret := &AST{Child: app}
 	return ret, nil
 }
 
