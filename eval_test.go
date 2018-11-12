@@ -40,6 +40,10 @@ func Test_evalEnvironment(t *testing.T) {
 	if v != nil {
 		t.Error("Lookup for unassigned name should return nil")
 	}
+	err = ee.Unassign("no-such-key")
+	if err == nil {
+		t.Error("Unassign for not-assigned name should return error")
+	}
 }
 
 func Test_evalIf(t *testing.T) {
