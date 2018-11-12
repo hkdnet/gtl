@@ -18,8 +18,7 @@ const (
 	Pred
 	// IsZero is a builtin function, iszero
 	IsZero
-	// Variable is a variable
-	// TODO: better comment ...
+	// Variable is a variable, which is bound by outer LambdaDef
 	Variable
 	// FreeVariable is a free variable
 	FreeVariable
