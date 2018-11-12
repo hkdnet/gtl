@@ -40,3 +40,37 @@ func Test_evalEnvironment(t *testing.T) {
 		t.Error("Lookup for unassigned name should return error")
 	}
 }
+
+func evalFromString(str string) (*AST, error) {
+	l := NewLexer(str)
+	var tokens []*Token
+	for l.HasNext() {
+		t, err := l.NextToken()
+		if err != nil {
+			return nil, err
+		}
+		tokens = append(tokens, t)
+	}
+	return Parse(tokens)
+}
+
+func Test_evalIf(t *testing.T) {
+	ast, err := evalFromString("if true then a else b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	ast.show()
+	pg := ast.Child
+	ifNode := pg.Children[0]
+	if want, got := IF, ifNode.NodeType; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+	var env evalEnvironment
+	n, err := evalIf(ifNode, &env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want, got := "a", n.Name; got != want {
+		t.Errorf("want %v but got %v\n", want, got)
+	}
+}
