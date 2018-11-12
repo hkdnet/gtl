@@ -288,7 +288,7 @@ func parseWord(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, 
 		env.idx++
 		return ret, env, nil
 	}
-	words := []*Node{buildVariableNode(env, tokens[env.idx].Text)}
+	nodes := []*Node{buildVariableNode(env, tokens[env.idx].Text)}
 	env.idx++
 applyLoop:
 	for i := env.idx; ; {
@@ -298,15 +298,15 @@ applyLoop:
 			break applyLoop
 		case Word:
 			v := buildVariableNode(env, tokens[i].Text)
-			words = append(words, v)
+			nodes = append(nodes, v)
 			i++
 		case KeywordTrue:
 			v := &Node{NodeType: True}
-			words = append(words, v)
+			nodes = append(nodes, v)
 			i++
 		case KeywordFalse:
 			v := &Node{NodeType: False}
-			words = append(words, v)
+			nodes = append(nodes, v)
 			i++
 		case KeywordThen, KeywordElse:
 			env.idx = i
@@ -315,6 +315,6 @@ applyLoop:
 			return nil, env, fmt.Errorf("unexpected token %v at %d", t, i)
 		}
 	}
-	app := nodesToApply(words)
+	app := nodesToApply(nodes)
 	return app, env, nil
 }
