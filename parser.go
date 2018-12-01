@@ -92,6 +92,8 @@ func parse(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, erro
 		return nil, env, fmt.Errorf("unexpected token %v at %d", t.Text, env.idx)
 	case KeywordIf:
 		return parseIf(tokens, env)
+	case KeywordIsZero:
+		return parseIsZero(tokens, env)
 	case Dot: // start param
 		return parseDot(tokens, env)
 	case Word:
@@ -174,6 +176,11 @@ func parseIf(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, er
 	}
 	ret.Children[2] = falsePart
 	return ret, env, err
+}
+
+func parseIsZero(tokens []*Token, env parseEnvironemnt) (*Node, parseEnvironemnt, error) {
+	env.idx++
+	return &Node{NodeType: IsZero}, env, nil
 }
 
 // .x .y -> x y
