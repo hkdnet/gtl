@@ -32,4 +32,6 @@ const (
 	KeywordThen
 	// KeywordElse is "else"
 	KeywordElse
+	// KeywordIsZero is "iszero"
+	KeywordIsZero
 )

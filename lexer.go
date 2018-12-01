@@ -33,6 +33,7 @@ func init() {
 	keywordMap["if"] = KeywordIf
 	keywordMap["then"] = KeywordThen
 	keywordMap["else"] = KeywordElse
+	keywordMap["iszero"] = KeywordIsZero
 }
 
 // NewLexer returns a new lexer from source string

@@ -1,6 +1,8 @@
 package gtl
 
-import "testing"
+import (
+	"testing"
+)
 
 // NOTE: this function may cause panic
 func buildASTFromString(str string) *AST {
@@ -98,6 +100,11 @@ func Test_evalApply(t *testing.T) {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 		if want, got := True, n.Children[1].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
+	assertEval("iszero 0", func(n *Node) {
+		if want, got := True, n.NodeType; got != want {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	})

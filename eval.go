@@ -48,7 +48,7 @@ func Eval(ast *AST) (*Node, error) {
 
 func eval(n *Node, env *evalEnvironment) (*Node, error) {
 	switch n.NodeType {
-	case True, False, Zero, FreeVariable, Lambda:
+	case True, False, Zero, FreeVariable, Lambda, NodeNumber, IsZero:
 		return n, nil
 	case IF:
 		return evalIf(n, env)
@@ -96,8 +96,14 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	if l.NodeType != Lambda { // cannot eval apply
+	if !l.IsApplyable() { // cannot eval apply
 		return &Node{NodeType: Apply, Children: []*Node{l, r}}, nil
+	}
+	if l.NodeType == IsZero {
+		if r.NodeType == Zero {
+			return &Node{NodeType: True}, nil
+		}
+		return &Node{NodeType: False}, nil
 	}
 	// l.NodeType == Lambda
 	def := l.Children[0]

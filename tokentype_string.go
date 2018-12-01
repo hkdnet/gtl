@@ -4,9 +4,9 @@ package gtl
 
 import "strconv"
 
-const _TokenType_name = "EOFWordLParenRParenLBlaceRBlaceArrowDotNumberKeywordTrueKeywordFalseKeywordIfKeywordThenKeywordElse"
+const _TokenType_name = "EOFWordLParenRParenLBlaceRBlaceArrowDotNumberKeywordTrueKeywordFalseKeywordIfKeywordThenKeywordElseKeywordIsZero"
 
-var _TokenType_index = [...]uint8{0, 3, 7, 13, 19, 25, 31, 36, 39, 45, 56, 68, 77, 88, 99}
+var _TokenType_index = [...]uint8{0, 3, 7, 13, 19, 25, 31, 36, 39, 45, 56, 68, 77, 88, 99, 112}
 
 func (i TokenType) String() string {
 	if i >= TokenType(len(_TokenType_index)-1) {
