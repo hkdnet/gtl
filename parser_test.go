@@ -1,7 +1,6 @@
 package gtl
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -246,7 +245,6 @@ func Test_parseWord(t *testing.T) {
 	if want, got := Apply, node.NodeType; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
-	fmt.Printf("%v\n", node.Children)
 	if want, got := "d", node.Children[1].Name; got != want {
 		t.Errorf("want %v but got %v\n", want, got)
 	}
