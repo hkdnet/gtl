@@ -108,4 +108,20 @@ func Test_evalApply(t *testing.T) {
 			t.Errorf("want %v but got %v\n", want, got)
 		}
 	})
+
+	assertEval("(.a .b -> a b) iszero", func(n *Node) {
+		// .b -> iszero b
+		if want, got := Lambda, n.NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := 2, len(n.Children); got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := LambdaDef, n.Children[0].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+		if want, got := LambdaBody, n.Children[1].NodeType; got != want {
+			t.Errorf("want %v but got %v\n", want, got)
+		}
+	})
 }
