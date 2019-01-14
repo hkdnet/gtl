@@ -100,6 +100,9 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 		return &Node{NodeType: Apply, Children: []*Node{l, r}}, nil
 	}
 	if l.NodeType == IsZero {
+		if !r.IsValue() {
+			return &Node{NodeType: Apply, Children: []*Node{l, r}}, nil
+		}
 		if r.NodeType == Zero {
 			return &Node{NodeType: True}, nil
 		}
