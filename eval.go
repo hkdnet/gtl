@@ -108,7 +108,12 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 		}
 		return &Node{NodeType: False}, nil
 	}
+
 	// l.NodeType == Lambda
+	if l.NodeType != Lambda {
+		panic("assert!")
+	}
+
 	def := l.Children[0]
 	body := l.Children[1]
 	assigned := def.Children[0]
