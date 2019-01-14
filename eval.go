@@ -129,7 +129,10 @@ func evalApply(n *Node, env *evalEnvironment) (*Node, error) {
 	def.Children = def.Children[1:] // tail
 	ret := &Node{
 		NodeType: Lambda,
-		Children: []*Node{def, body},
+		Children: []*Node{
+			def,
+			&Node{NodeType: LambdaBody, Children: []*Node{body}},
+		},
 	}
 	return ret, nil
 }
